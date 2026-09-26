@@ -1,0 +1,183 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.{js,jsx}';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+| Design tokens — "Precision Engineering"
+| Base #0A0A0F, single electric accent #C6FF3E, cyan #22D3EE as secondary.
+*/
+@theme {
+    /* Base surfaces */
+    --color-base: #0a0a0f;
+    --color-surface: #0f0f16;
+    --color-surface-2: #14141d;
+    --color-elevated: #1a1a24;
+
+    /* Accents */
+    --color-accent: #c6ff3e;
+    --color-accent-soft: #e2ffa8;
+    --color-accent-dim: #8fb828;
+    --color-secondary: #22d3ee;
+
+    /* Text */
+    --color-foreground: #f5f5f7;
+    --color-muted-foreground: #a1a1ad;
+    --color-subtle: #6f6f7d;
+
+    /* Lines */
+    --color-hairline: rgb(255 255 255 / 0.1);
+    --color-hairline-strong: rgb(255 255 255 / 0.18);
+
+    /* Typography */
+    --font-display: 'Space Grotesk', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    /* Motion */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* Layout */
+    --spacing-section: 7.5rem;
+
+    /* Radius */
+    --radius-card: 1rem;
+}
+
+@layer base {
+    :root {
+        color-scheme: dark;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-base text-foreground font-sans;
+        text-rendering: optimizeLegibility;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display tracking-tight;
+    }
+
+    /* Visible focus for keyboard users only */
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-accent;
+    }
+
+    ::selection {
+        @apply bg-accent text-base;
+    }
+
+    /* Subtle grid + film grain texture (see .texture-grid / .texture-grain) */
+    .texture-grid {
+        background-image:
+            linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+        background-size: 72px 72px;
+    }
+
+    .texture-grain::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.22;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    }
+
+    .glass {
+        @apply border border-hairline bg-white/[0.03] backdrop-blur-xl;
+    }
+
+    .mask-fade-x {
+        mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    }
+
+    /* Marquee / ambient loops honour reduced motion globally */
+    @media (prefers-reduced-motion: reduce) {
+        .motion-safe-only {
+            animation: none !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@layer components {
+    .container-page {
+        @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10;
+    }
+
+    .section-pad {
+        @apply py-24 sm:py-28 lg:py-32;
+    }
+}
+
+@keyframes marquee-x {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes pulse-dot {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@keyframes spin-slow {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shiny-sweep {
+    from {
+        background-position: 180% 0;
+    }
+
+    to {
+        background-position: -80% 0;
+    }
+}
+
+@keyframes spark-fly {
+    0% {
+        opacity: 1;
+        transform: translate(var(--x), var(--y)) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(0.2);
+    }
+}
+
+@keyframes marquee-loop {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="ASSEMBLY SIMULATOR placeholder cover">
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#14141D"/>
+            <stop offset="100%" stop-color="#0A0A0F"/>
+        </linearGradient>
+        <radialGradient id="glow" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#A78BFA" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#A78BFA" stop-opacity="0"/>
+        </radialGradient>
+    </defs>
+    <rect width="800" height="500" fill="url(#bg)"/>
+    <rect width="800" height="500" fill="url(#glow)"/>
+    <g stroke="#ffffff" stroke-opacity="0.05">
+        <path d="M0 100H800M0 200H800M0 300H800M0 400H800M100 0V500M200 0V500M300 0V500M400 0V500M500 0V500M600 0V500M700 0V500"/>
+    </g>
+    
+        <g fill="none" stroke="{accent}" stroke-width="2" opacity="0.85">
+            <path d="M400 140 L580 240 L400 340 L220 240 Z" stroke-linejoin="round"/>
+            <path d="M400 340 L580 240 L580 400 L400 500 L220 400 L220 240" stroke-linejoin="round" opacity="0.6"/>
+        </g>
+        <g fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2">
+            <path d="M400 420 L520 490 L400 560 L280 490 Z" stroke-linejoin="round"/>
+        </g>
+    <text x="40" y="452" font-family="ui-monospace, monospace" font-size="20" letter-spacing="7" fill="#A78BFA" opacity="0.9">ASSEMBLY SIMULATOR</text>
+    <text x="760" y="452" text-anchor="end" font-family="ui-monospace, monospace" font-size="14" letter-spacing="4" fill="#6F6F7D">COVER PLACEHOLDER</text>
+</svg>
