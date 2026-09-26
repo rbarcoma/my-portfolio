@@ -17,7 +17,7 @@ return [
             'stack' => ['Python', 'Pandas', 'scikit-learn', 'Flask', 'MySQL', 'Chart.js'],
             'links' => [
                 'live' => null,
-                'repo' => 'https://github.com/renantebarcoma',
+                'repo' => 'https://github.com/rbarcoma',
                 'video' => null,
             ],
             'overview' => 'Hourly consumption data does not tell you what to do next — it just tells you what already happened. This project adds the missing layer: a forecasting pipeline with a decision support interface on top, so facility managers can see projected demand, compare scenarios, and act before a peak hits.',

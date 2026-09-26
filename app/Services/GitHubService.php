@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,7 @@ class GitHubService
      *     profile: array<string, mixed>|null,
      *     repos: list<array<string, mixed>>,
      *     languages: list<array{name: string, color: string, percentage: float}>,
-     *     contributions: array{weeks: list<array<int, int>>, total: int, this_year: int}|null
+     *     contributions: array{weeks: list<list<int>>, total: int, this_year: int}|null
      * }
      */
     public function stats(): array
@@ -159,49 +160,93 @@ class GitHubService
      * Contribution weeks come from a community endpoint; failures are expected
      * and simply produce the static fallback in the UI.
      *
-     * @return array{weeks: list<array<int, int>>, total: int, this_year: int}|null
+     * @return array{weeks: list<list<int>>, total: int, this_year: int}|null
      */
     public function contributions(string $username): ?array
     {
         return Cache::remember("github.contributions.{$username}", self::CONTRIBUTIONS_TTL, function () use ($username): ?array {
-            $weeks = $this->getJson("https://github-contributions-api.jogruber.de/v4/{$username}");
+            $days = $this->contributionDays(
+                $this->getJson("https://github-contributions-api.jogruber.de/v4/{$username}") ?? []
+            );
 
-            if (! is_array($weeks)) {
+            if ($days === []) {
                 return null;
             }
 
             $year = (int) now()->format('Y');
-            $total = 0;
             $thisYear = 0;
 
-            $normalized = [];
-
-            foreach ($weeks as $week) {
-                if (! is_array($week) || ! isset($week['days'])) {
-                    continue;
+            foreach ($days as $day) {
+                if ((int) substr($day['date'], 0, 4) === $year) {
+                    $thisYear += $day['count'];
                 }
-
-                $counts = [];
-
-                foreach ($week['days'] as $day) {
-                    $count = (int) ($day['count'] ?? 0);
-                    $counts[] = $count;
-                    $total += $count;
-
-                    if ((int) substr((string) ($day['date'] ?? ''), 0, 4) === $year) {
-                        $thisYear += $count;
-                    }
-                }
-
-                $normalized[] = $counts;
             }
 
             return [
-                'weeks' => $normalized,
-                'total' => $total,
+                'weeks' => $this->contributionWeeks($days),
+                'total' => array_sum(array_column($days, 'count')),
                 'this_year' => $thisYear,
             ];
         });
+    }
+
+    /**
+     * The upstream endpoint has reshaped its payload between major versions:
+     * v4 returns a flat list of days, older ones nested them inside week
+     * objects. Both are normalised to one ascending, de-duplicated list that
+     * stops at today, so the graph never trails empty future columns.
+     *
+     * @param  array<array-key, mixed>  $payload
+     * @return list<array{date: string, count: int}>
+     */
+    private function contributionDays(array $payload): array
+    {
+        $days = $payload['contributions'] ?? [];
+
+        if (! is_array($days) || $days === []) {
+            $days = array_merge(
+                ...array_map(fn (mixed $week): array => is_array($week) ? ($week['days'] ?? []) : [], $payload)
+            );
+        }
+
+        $today = now()->format('Y-m-d');
+        $counts = [];
+
+        foreach ($days as $day) {
+            $date = is_array($day) ? ($day['date'] ?? null) : null;
+
+            if (is_string($date) && $date !== '' && $date <= $today) {
+                $counts[$date] = (int) ($day['count'] ?? 0);
+            }
+        }
+
+        ksort($counts);
+
+        return array_map(
+            fn (string $date, int $count): array => ['date' => $date, 'count' => $count],
+            array_keys($counts),
+            array_values($counts),
+        );
+    }
+
+    /**
+     * Columns of seven days, Sunday first, padded so every column lines up
+     * with a weekday exactly like the GitHub profile heatmap.
+     *
+     * @param  list<array{date: string, count: int}>  $days
+     * @return list<list<int>>
+     */
+    private function contributionWeeks(array $days): array
+    {
+        $leading = Carbon::parse($days[0]['date'])->dayOfWeek;
+        $cells = array_merge(array_fill(0, $leading, 0), array_column($days, 'count'));
+        $trailing = (7 - count($cells) % 7) % 7;
+
+        if ($trailing > 0) {
+            $cells = array_merge($cells, array_fill(0, $trailing, 0));
+        }
+
+        return array_chunk($cells, 7);
     }
 
     /**
@@ -237,7 +282,7 @@ class GitHubService
      *     profile: array<string, mixed>|null,
      *     repos: list<array<string, mixed>>,
      *     languages: list<array{name: string, color: string, percentage: float}>,
-     *     contributions: array{weeks: list<array<int, int>>, total: int, this_year: int}|null
+     *     contributions: array{weeks: list<list<int>>, total: int, this_year: int}|null
      * }
      */
     private function emptyStats(string $username): array

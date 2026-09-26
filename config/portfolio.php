@@ -16,7 +16,7 @@ return [
 
     'timezone' => env('PORTFOLIO_TIMEZONE', 'Asia/Manila'),
 
-    'email' => env('PORTFOLIO_EMAIL', 'hello@example.com'),
+    'email' => env('PORTFOLIO_EMAIL', 'renantebarcoma1@gmail.com'),
 
     'availability' => 'Open to full-time roles, freelance projects, and internships.',
 
@@ -198,12 +198,16 @@ return [
     */
 
     'socials' => [
-        ['label' => 'GitHub', 'url' => 'https://github.com/renantebarcoma', 'icon' => 'github'],
-        ['label' => 'LinkedIn', 'url' => 'https://www.linkedin.com/in/renantebarcoma', 'icon' => 'linkedin'],
-        ['label' => 'Email', 'url' => 'mailto:hello@example.com', 'icon' => 'mail'],
+        ['label' => 'GitHub', 'url' => 'https://github.com/rbarcoma', 'icon' => 'github'],
+        [
+            'label' => 'LinkedIn',
+            'url' => 'https://www.linkedin.com/in/renante-barcoma-a70a5a438/',
+            'icon' => 'linkedin',
+        ],
+        ['label' => 'Email', 'url' => 'mailto:renantebarcoma1@gmail.com', 'icon' => 'mail'],
     ],
 
-    'github_username' => env('GITHUB_USERNAME', 'renantebarcoma'),
+    'github_username' => env('GITHUB_USERNAME', 'rbarcoma'),
 
     'cv' => [
         'label' => 'Download CV',
