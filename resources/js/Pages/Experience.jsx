@@ -9,7 +9,7 @@ export default function Experience({ timeline }) {
             <Head title="Experience" />
 
             <PageHeader
-                eyebrow="04 — Experience"
+                eyebrow="Experience"
                 title="The path so far."
                 lead="Undergraduate foundations, freelance builds, and projects that forced me to learn something new on purpose."
             />

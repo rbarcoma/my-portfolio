@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { ArrowUp, Mail, MapPin } from 'lucide-react';
 import { useRoute } from '../../lib/route';
 import { Container } from '../common/Container';
 import { BRAND_ICONS } from '../common/BrandIcons';
 
 const LINKS = [
-    { label: 'Home', route: 'home' },
-    { label: 'About', route: 'about' },
-    { label: 'Skills', route: 'skills' },
-    { label: 'Projects', route: 'projects.index' },
-    { label: 'Experience', route: 'experience' },
-    { label: 'Contact', route: 'contact' },
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
+    { id: 'skills', label: 'Skills' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'experience', label: 'Experience' },
+    { id: 'contact', label: 'Contact' },
 ];
 
 const ICONS = {
@@ -88,7 +88,7 @@ export function Footer({ socials = [], portfolio = {} }) {
         <footer className="relative mt-32 overflow-hidden border-t border-hairline">
             <p
                 aria-hidden="true"
-                className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 font-display text-[clamp(4rem,18vw,14rem)] leading-none font-bold whitespace-nowrap text-white/[0.03] select-none"
+                className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 font-display text-[clamp(4rem,18vw,14rem)] leading-none font-bold whitespace-nowrap text-foreground/3 select-none"
             >
                 {portfolio.name ?? 'Renante Barcoma'}
             </p>
@@ -116,13 +116,13 @@ export function Footer({ socials = [], portfolio = {} }) {
                         <p className="font-mono text-xs tracking-[0.25em] text-subtle uppercase">Sitemap</p>
                         <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3">
                             {LINKS.map((link) => (
-                                <li key={link.route}>
-                                    <Link
-                                        href={route(link.route)}
+                                <li key={link.id}>
+                                    <a
+                                        href={route('home') + '#' + link.id}
                                         className="text-sm text-muted-foreground transition-colors hover:text-accent"
                                     >
                                         {link.label}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                         </ul>

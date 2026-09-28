@@ -14,12 +14,10 @@ class HomeController extends Controller
             'hero' => config('portfolio.hero'),
             'stats' => config('portfolio.stats'),
             'about' => config('portfolio.about'),
+            'groups' => config('portfolio.skill_groups'),
+            'projects' => config('projects.projects'),
+            'timeline' => config('portfolio.timeline'),
             'contact' => config('portfolio.contact'),
-            'cv' => config('portfolio.cv'),
-            'featuredProjects' => array_values(array_filter(
-                config('projects.projects'),
-                fn (array $project): bool => $project['featured'],
-            )),
             'statuses' => config('projects.statuses'),
             'github' => $github->stats(),
         ]);

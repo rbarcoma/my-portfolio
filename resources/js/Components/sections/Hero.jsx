@@ -1,10 +1,8 @@
-import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useRoute } from '../../lib/route';
 import { Button } from '../ui/button';
-import { CvButton } from '../common/CvButton';
 import { RotatingText } from '../reactbits/RotatingText';
 import { ScrambleText } from '../reactbits/ScrambleText';
 import { SplitText } from '../reactbits/SplitText';
@@ -14,16 +12,16 @@ import { Container } from '../common/Container';
 
 const HEADLINE_WORDS = ['FULL-STACK', 'DEVELOPER'];
 
-export function Hero({ hero, cv }) {
+export function Hero({ hero }) {
     const route = useRoute();
     const reduced = useReducedMotion();
 
     return (
-        <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-24 pb-16">
+        <section id="home" className="relative flex min-h-[100svh] scroll-mt-24 items-center overflow-hidden pt-24 pb-16">
             <DotGrid />
 
             <Container className="relative">
-                <div className="max-w-5xl">
+                <div className="mx-auto max-w-5xl text-center">
                     <motion.p
                         initial={reduced ? false : { opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -53,7 +51,7 @@ export function Hero({ hero, cv }) {
                         initial={reduced ? false : { opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                        className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
+                        className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
                     >
                         I build{' '}
                         <RotatingText
@@ -68,18 +66,14 @@ export function Hero({ hero, cv }) {
                         initial={reduced ? false : { opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                        className="mt-10 flex flex-wrap items-center gap-4"
+                        className="mt-10 flex flex-wrap items-center justify-center gap-4"
                     >
                         <Magnet>
-                            <CvButton cv={cv} size="lg" />
-                        </Magnet>
-
-                        <Magnet>
                             <Button asChild variant="outline" size="lg">
-                                <Link href={route('projects.index')} data-cursor="hover">
+                                <a href={route('home') + '#projects'} data-cursor="hover">
                                     View projects
                                     <ArrowRight aria-hidden="true" />
-                                </Link>
+                                </a>
                             </Button>
                         </Magnet>
                     </motion.div>

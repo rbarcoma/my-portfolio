@@ -12,7 +12,7 @@ export default function Skills({ groups }) {
             <Head title="Skills" />
 
             <PageHeader
-                eyebrow="02 — Skills"
+                eyebrow="Skills"
                 title="The toolkit behind the work."
                 lead={`${total} tools across frontend, backend, infrastructure and design — grouped by how I actually use them.`}
             />

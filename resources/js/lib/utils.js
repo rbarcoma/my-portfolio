@@ -28,10 +28,3 @@ export function formatNumber(value) {
 export function toWords(text) {
     return text.split(' ');
 }
-
-/**
- * `01`, `02`, ... section index labels.
- */
-export function sectionIndex(index) {
-    return String(index + 1).padStart(2, '0');
-}

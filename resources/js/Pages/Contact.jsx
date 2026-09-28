@@ -10,7 +10,7 @@ export default function Contact({ contact, socials }) {
         <>
             <Head title="Contact" />
 
-            <PageHeader eyebrow="05 — Contact" title={contact.headline} lead={contact.lead} />
+            <PageHeader eyebrow="Contact" title={contact.headline} lead={contact.lead} />
 
             <section className="pb-28 sm:pb-36">
                 <Container>

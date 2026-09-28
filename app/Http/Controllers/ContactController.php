@@ -42,6 +42,8 @@ class ContactController extends Controller
             ]);
         }
 
-        return to_route('contact')->with('success', 'Message sent. I will get back to you shortly.');
+        return to_route('home')
+            ->withFragment('contact')
+            ->with('success', 'Message sent. I will get back to you shortly.');
     }
 }

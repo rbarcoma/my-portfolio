@@ -3,7 +3,7 @@
  */
 export function contributionIntensity(count) {
     if (count === 0) {
-        return 'bg-white/5';
+        return 'bg-surface-2';
     }
 
     if (count < 3) {

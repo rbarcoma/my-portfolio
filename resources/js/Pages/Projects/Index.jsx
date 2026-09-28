@@ -11,7 +11,7 @@ export default function ProjectsIndex({ projects, statuses }) {
             <Head title="Projects" />
 
             <PageHeader
-                eyebrow="03 — Projects"
+                eyebrow="Projects"
                 title="Work that shipped."
                 lead="Three case studies: what the problem was, what I built, and the decisions that mattered."
             />

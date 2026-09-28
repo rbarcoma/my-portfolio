@@ -25,14 +25,14 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                     <div aria-hidden="true" className="absolute inset-0 texture-grid opacity-40" />
 
                     <Container className="relative">
-                        <Link
-                            href={route('projects.index')}
+                        <a
+                            href={route('home') + '#projects'}
                             data-cursor="hover"
                             className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase transition-colors hover:text-accent"
                         >
                             <ArrowLeft className="size-3.5" aria-hidden="true" />
                             All projects
-                        </Link>
+                        </a>
 
                         <div className="mt-8 grid gap-10 lg:grid-cols-12">
                             <div className="lg:col-span-8">
@@ -99,14 +99,14 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                     <Container>
                         <div className="grid gap-14 lg:grid-cols-12">
                             <div className="lg:col-span-8">
-                                <SectionHeading index={0} label="Overview" />
+                                <SectionHeading label="Overview" />
                                 <Reveal delay={0.05}>
                                     <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
                                         {project.overview}
                                     </p>
                                 </Reveal>
 
-                                <SectionHeading index={1} label="What it does" className="mt-20" />
+                                <SectionHeading label="What it does" className="mt-20" />
                                 <RevealGroup className="mt-8 flex flex-col gap-4">
                                     {project.features.map((feature) => (
                                         <RevealItem
@@ -122,7 +122,7 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                     ))}
                                 </RevealGroup>
 
-                                <SectionHeading index={2} label="Challenges" className="mt-20" />
+                                <SectionHeading label="Challenges" className="mt-20" />
                                 <div className="mt-8 flex flex-col gap-5">
                                     {project.challenges.map((challenge) => (
                                         <Reveal
@@ -144,7 +144,7 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                     ))}
                                 </div>
 
-                                <SectionHeading index={3} label="Outcomes" className="mt-20" />
+                                <SectionHeading label="Outcomes" className="mt-20" />
                                 <RevealGroup className="mt-8 flex flex-col gap-3">
                                     {project.outcomes.map((outcome) => (
                                         <RevealItem

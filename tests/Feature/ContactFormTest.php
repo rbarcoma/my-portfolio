@@ -7,7 +7,6 @@ use App\Notifications\ContactMessageReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
-use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class ContactFormTest extends TestCase
@@ -28,24 +27,19 @@ class ContactFormTest extends TestCase
         ], $overrides);
     }
 
-    public function test_contact_page_renders(): void
+    public function test_contact_url_redirects_to_the_home_contact_section(): void
     {
         $this->get(route('contact'))
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Contact')
-                ->has('contact.headline')
-                ->has('socials')
-            );
+            ->assertRedirect(route('home').'#contact');
     }
 
     public function test_valid_submission_is_persisted_and_notified(): void
     {
         Notification::fake();
 
-        $response = $this->from(route('contact'))->post(route('contact.store'), $this->payload());
+        $response = $this->from(route('home').'#contact')->post(route('contact.store'), $this->payload());
 
-        $response->assertRedirect(route('contact'));
+        $response->assertRedirect(route('home').'#contact');
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('contact_messages', [
@@ -70,12 +64,12 @@ class ContactFormTest extends TestCase
     {
         Notification::fake();
 
-        $response = $this->from(route('contact'))->post(route('contact.store'), $this->payload([
+        $response = $this->from(route('home').'#contact')->post(route('contact.store'), $this->payload([
             'email' => 'not-an-email',
             'message' => 'short',
         ]));
 
-        $response->assertRedirect(route('contact'));
+        $response->assertRedirect(route('home').'#contact');
         $response->assertSessionHasErrors(['email', 'message']);
 
         $this->assertSame(0, ContactMessage::count());
@@ -84,7 +78,7 @@ class ContactFormTest extends TestCase
 
     public function test_honeypot_submissions_are_rejected(): void
     {
-        $response = $this->from(route('contact'))->post(route('contact.store'), $this->payload([
+        $response = $this->from(route('home').'#contact')->post(route('contact.store'), $this->payload([
             'website' => 'https://spam.example',
         ]));
 

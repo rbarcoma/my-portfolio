@@ -29,7 +29,7 @@ export function CvButton({ cv, className, size = 'md', label }) {
  */
 export function PrivateProjectNotice({ email }) {
     return (
-        <div className="flex items-start gap-3 rounded-card border border-hairline bg-white/[0.02] p-5 text-sm text-muted-foreground">
+        <div className="flex items-start gap-3 rounded-card border border-hairline bg-surface/50 p-5 text-sm text-muted-foreground">
             <Lock className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />
             <p>
                 Private client project — a walkthrough is available on request.{' '}

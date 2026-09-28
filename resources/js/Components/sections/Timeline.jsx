@@ -9,7 +9,7 @@ import { Reveal } from '../common/Reveal';
  * Vertical journey timeline. The spine draws as you scroll; items fade in
  * as the line reaches them.
  */
-export function Timeline({ items }) {
+export function Timeline({ items, id, label = 'Experience' }) {
     const reduced = useReducedMotion();
     const trackRef = useRef(null);
     const { scrollYProgress } = useScroll({
@@ -19,11 +19,10 @@ export function Timeline({ items }) {
     const scaleY = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
     return (
-        <section className="section-pad">
+        <section id={id} className="scroll-mt-24 section-pad">
             <Container>
                 <SectionHeading
-                    index={0}
-                    label="Journey"
+                    label={label}
                     title="Education and hands-on work."
                     lead="Where the fundamentals came from, and what I have been building with them."
                 />
@@ -31,7 +30,7 @@ export function Timeline({ items }) {
                 <div ref={trackRef} className="relative mt-16 pl-10 sm:pl-16">
                     <div
                         aria-hidden="true"
-                        className="absolute top-2 bottom-2 left-[3px] w-px bg-white/10 sm:left-[7px]"
+                        className="absolute top-2 bottom-2 left-[3px] w-px bg-hairline sm:left-[7px]"
                     >
                         <motion.div
                             className="h-full w-full origin-top bg-accent"

@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { cn } from '../../lib/utils';
+import { RevealGroup, RevealItem } from '../common/Reveal';
+import { TechnologyIcon } from '../common/TechnologyIcon';
 import { SpotlightCard } from '../reactbits/SpotlightCard';
 
 /**
- * Skill group tabs + proficiency bars.
+ * Skill group tabs + technology marks.
  */
 export function SkillsGrid({ groups }) {
     const reduced = useReducedMotion();
@@ -15,6 +17,10 @@ export function SkillsGrid({ groups }) {
         () => groups.find((group) => group.id === active) ?? groups[0],
         [active, groups],
     );
+
+    if (!activeGroup) {
+        return null;
+    }
 
     return (
         <div>
@@ -31,7 +37,9 @@ export function SkillsGrid({ groups }) {
                             key={group.id}
                             type="button"
                             role="tab"
+                            id={`skills-tab-${group.id}`}
                             aria-selected={selected}
+                            aria-controls="skills-panel"
                             onClick={() => setActive(group.id)}
                             data-cursor="hover"
                             className={cn(
@@ -57,32 +65,23 @@ export function SkillsGrid({ groups }) {
                 initial={reduced ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="mt-10 grid gap-4 sm:grid-cols-2"
+                role="tabpanel"
+                id="skills-panel"
+                aria-labelledby={`skills-tab-${activeGroup.id}`}
+                className="mt-10"
             >
-                {activeGroup.skills.map((skill, index) => (
-                    <SpotlightCard key={skill.name} className="p-6">
-                        <div className="flex items-baseline justify-between gap-4">
-                            <h3 className="font-display text-lg">{skill.name}</h3>
-                            <span className="font-mono text-xs text-subtle tabular-nums">
-                                {skill.level}%
-                            </span>
-                        </div>
-
-                        <div
-                            className="mt-4 h-1 w-full overflow-hidden rounded-full bg-white/8"
-                            role="img"
-                            aria-label={`${skill.name} proficiency ${skill.level} percent`}
-                        >
-                            <motion.div
-                                className="h-full rounded-full bg-accent"
-                                initial={reduced ? { width: `${skill.level}%` } : { width: '0%' }}
-                                whileInView={{ width: `${skill.level}%` }}
-                                viewport={{ once: true }}
-                                transition={{ duration: reduced ? 0 : 0.9, delay: reduced ? 0 : index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                            />
-                        </div>
-                    </SpotlightCard>
-                ))}
+                <RevealGroup className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" stagger={0.06}>
+                    {activeGroup.skills.map((skill) => (
+                        <RevealItem key={skill.name} y={16}>
+                            <SpotlightCard className="flex aspect-square items-center justify-center p-5 sm:p-6">
+                                <div className="flex flex-col items-center gap-4 text-center">
+                                    <TechnologyIcon skill={skill} className="size-12 sm:size-14" />
+                                    <h3 className="font-display text-sm text-foreground sm:text-base">{skill.name}</h3>
+                                </div>
+                            </SpotlightCard>
+                        </RevealItem>
+                    ))}
+                </RevealGroup>
             </motion.div>
         </div>
     );

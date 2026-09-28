@@ -113,7 +113,7 @@ class GitHubService
      */
     public function languages(string $username): array
     {
-        return Cache::remember("github.languages.{$username}", self::PROFILE_TTL, function () use ($username): array {
+        return Cache::remember("github.languages.v2.{$username}", self::PROFILE_TTL, function () use ($username): array {
             $repos = $this->getJson("https://api.github.com/users/{$username}/repos", ['per_page' => 100]);
 
             if ($repos === null) {
@@ -127,7 +127,7 @@ class GitHubService
                 'Python' => '#F5C542',
                 'HTML' => '#E34F26',
                 'CSS' => '#A78BFA',
-                'Blade' => '#0A0A0F',
+                'Blade' => '#F7523F',
                 'Vue' => '#41B883',
                 'Java' => '#F89820',
             ];

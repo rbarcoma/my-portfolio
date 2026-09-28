@@ -1,16 +1,10 @@
-import { Link } from '@inertiajs/react';
-import { ArrowRight } from 'lucide-react';
-import { useRoute } from '../../lib/route';
 import { Container } from '../common/Container';
 import { SectionHeading } from '../common/SectionHeading';
-import { Reveal } from '../common/Reveal';
-import { SpotlightCard } from '../reactbits/SpotlightCard';
+import { Reveal, RevealGroup, RevealItem } from '../common/Reveal';
 
-export function AboutTeaser({ about, cv }) {
-    const route = useRoute();
-
+export function AboutTeaser({ about, id = 'about' }) {
     return (
-        <section className="section-pad">
+        <section id={id} className="scroll-mt-24 section-pad">
             <Container>
                 <div className="grid gap-14 lg:grid-cols-12">
                     <div className="lg:col-span-5">
@@ -18,7 +12,7 @@ export function AboutTeaser({ about, cv }) {
                             <div className="relative aspect-4/5 overflow-hidden rounded-card border border-hairline bg-elevated">
                                 <img
                                     src={about.photo}
-                                    alt={`${about.headline} — portrait`}
+                                    alt="Portrait of Renante Barcoma"
                                     loading="lazy"
                                     decoding="async"
                                     width={800}
@@ -37,42 +31,27 @@ export function AboutTeaser({ about, cv }) {
                     </div>
 
                     <div className="lg:col-span-7">
-                        <SectionHeading index={2} label="About" title={about.headline} lead={about.lead} />
+                        <SectionHeading label="About" title={about.headline} lead={about.lead} />
 
-                        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                            {about.values.map((value) => (
-                                <SpotlightCard key={value.title} className="p-6">
-                                    <h3 className="font-display text-base text-foreground">{value.title}</h3>
-                                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                        {value.description}
-                                    </p>
-                                </SpotlightCard>
+                        <RevealGroup className="mt-8 flex flex-col gap-5">
+                            {about.bio.map((paragraph) => (
+                                <RevealItem key={paragraph.slice(0, 32)}>
+                                    <p className="leading-relaxed text-muted-foreground">{paragraph}</p>
+                                </RevealItem>
                             ))}
-                        </div>
+                        </RevealGroup>
 
                         <Reveal delay={0.1}>
-                            <div className="mt-10 flex flex-wrap items-center gap-4">
-                                <Link
-                                    href={route('about')}
-                                    data-cursor="hover"
-                                    className="group inline-flex items-center gap-2 text-sm text-foreground transition-colors hover:text-accent"
-                                >
-                                    More about me
-                                    <ArrowRight
-                                        className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                                        aria-hidden="true"
-                                    />
-                                </Link>
-
-                                <a
-                                    href="/cv"
-                                    download={cv?.filename}
-                                    data-cursor="hover"
-                                    className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-accent hover:underline"
-                                >
-                                    {cv?.label ?? 'Download CV'}
-                                </a>
-                            </div>
+                            <dl className="mt-8 grid gap-x-8 gap-y-5 border-t border-hairline pt-8 sm:grid-cols-2">
+                                {about.quick_facts.map((fact) => (
+                                    <div key={fact.label} className="flex flex-col gap-1">
+                                        <dt className="font-mono text-[0.65rem] tracking-[0.2em] text-subtle uppercase">
+                                            {fact.label}
+                                        </dt>
+                                        <dd className="text-sm text-foreground">{fact.value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
                         </Reveal>
                     </div>
                 </div>

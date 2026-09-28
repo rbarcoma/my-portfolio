@@ -1,4 +1,3 @@
-import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import { useRoute } from '../../lib/route';
 import { Button } from '../ui/button';
@@ -46,10 +45,10 @@ export function CtaBand({ title = "Let's build something", lead, items }) {
                     <div className="mt-10 flex justify-center">
                         <Magnet>
                             <Button asChild size="lg">
-                                <Link href={route('contact')} data-cursor="hover">
+                                <a href={route('home') + '#contact'} data-cursor="hover">
                                     Start a conversation
                                     <ArrowRight aria-hidden="true" />
-                                </Link>
+                                </a>
                             </Button>
                         </Magnet>
                     </div>

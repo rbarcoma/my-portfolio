@@ -22,7 +22,7 @@ class ProjectController extends Controller
         $project = $projects->firstWhere('slug', $slug);
 
         if ($project === null) {
-            return to_route('projects.index');
+            return to_route('home')->withFragment('projects');
         }
 
         $index = $projects->keys()->search(fn (int $key): bool => $projects->get($key)['slug'] === $slug);

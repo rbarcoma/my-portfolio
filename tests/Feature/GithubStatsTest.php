@@ -80,6 +80,25 @@ class GithubStatsTest extends TestCase
         Http::assertSentCount($requestsAfterFirstVisit);
     }
 
+    public function test_blade_language_uses_the_blade_red_color(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'api.github.com/users/octocat/repos*' => Http::response([
+                ['language' => 'Blade'],
+                ['language' => 'PHP'],
+            ]),
+        ]);
+
+        Cache::flush();
+
+        $languages = $this->app->make(GitHubService::class)->languages('octocat');
+        $blade = collect($languages)->firstWhere('name', 'Blade');
+
+        $this->assertNotNull($blade);
+        $this->assertSame('#F7523F', $blade['color']);
+    }
+
     public function test_contributions_are_totalled_per_year(): void
     {
         $this->travelTo(now()->startOfYear()->addMonths(2)->startOfDay());

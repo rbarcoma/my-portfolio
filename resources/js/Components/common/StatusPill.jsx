@@ -5,7 +5,7 @@
 export function StatusPill({ status, statuses = {} }) {
     const meta = statuses[status] ?? {
         label: status,
-        className: 'text-muted-foreground border-hairline bg-white/5',
+        className: 'text-muted-foreground border-hairline bg-surface-2',
     };
 
     return (

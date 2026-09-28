@@ -3,18 +3,16 @@ import { PageHeader } from '../Components/common/PageHeader';
 import { Container } from '../Components/common/Container';
 import { Reveal, RevealGroup, RevealItem } from '../Components/common/Reveal';
 import { CvButton } from '../Components/common/CvButton';
-import { SpotlightCard } from '../Components/reactbits/SpotlightCard';
 import { Timeline } from '../Components/sections/Timeline';
-import { GithubPanel } from '../Components/sections/GitHubPanel';
 import { CtaBand } from '../Components/sections/CtaBand';
 
-export default function About({ about, timeline, cv, github }) {
+export default function About({ about, timeline, cv }) {
     return (
         <>
             <Head title="About" />
 
             <PageHeader
-                eyebrow="01 — About"
+                eyebrow="About"
                 title={about.headline}
                 lead={about.lead}
             />
@@ -74,31 +72,7 @@ export default function About({ about, timeline, cv, github }) {
                 </Container>
             </section>
 
-            <section className="section-pad">
-                <Container>
-                    <h2 className="text-[clamp(1.75rem,4vw,3rem)] leading-tight">How I work</h2>
-
-                    <RevealGroup className="mt-10 grid gap-5 md:grid-cols-3">
-                        {about.values.map((value, index) => (
-                            <RevealItem key={value.title}>
-                                <SpotlightCard className="h-full p-8">
-                                    <p className="font-mono text-xs text-accent">
-                                        {String(index + 1).padStart(2, '0')}
-                                    </p>
-                                    <h3 className="mt-4 font-display text-lg">{value.title}</h3>
-                                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                        {value.description}
-                                    </p>
-                                </SpotlightCard>
-                            </RevealItem>
-                        ))}
-                    </RevealGroup>
-                </Container>
-            </section>
-
-            <Timeline items={timeline} />
-
-            {github?.available && <GithubPanel github={github} />}
+            <Timeline items={timeline} label="Journey" />
 
             <CtaBand title="Want the short version?" lead="The CV has the details, the timeline above has the story." />
         </>

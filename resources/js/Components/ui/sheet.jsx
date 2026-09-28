@@ -29,7 +29,7 @@ export function Sheet({ open, onOpenChange, children, side = 'right', label = 'M
                 >
                     {children}
                     <DialogPrimitive.Close
-                        className="absolute top-5 right-5 rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground focus-visible:outline-2 focus-visible:outline-accent"
+                        className="absolute top-5 right-5 rounded-full p-2 text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-accent"
                         aria-label="Close menu"
                     >
                         <X className="size-5" aria-hidden="true" />

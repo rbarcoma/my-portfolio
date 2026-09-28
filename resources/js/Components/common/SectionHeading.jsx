@@ -1,11 +1,10 @@
 import { cn } from '../../lib/utils';
-import { sectionIndex } from '../../lib/utils';
 import { Reveal } from './Reveal';
 
 /**
- * Mono section label (`01 — ABOUT`) + display heading + optional lead.
+ * Mono section label + display heading + optional lead.
  */
-export function SectionHeading({ index, label, title, lead, align = 'left', className, children }) {
+export function SectionHeading({ label, title, lead, align = 'left', className, children }) {
     return (
         <div
             className={cn(
@@ -16,11 +15,7 @@ export function SectionHeading({ index, label, title, lead, align = 'left', clas
         >
             {label !== undefined && (
                 <Reveal>
-                    <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-accent uppercase">
-                        {index !== undefined && <span className="text-subtle">{sectionIndex(index)}</span>}
-                        <span aria-hidden="true" className="h-px w-8 bg-accent/50" />
-                        {label}
-                    </p>
+                    <p className="font-mono text-xs tracking-[0.3em] text-accent uppercase">{label}</p>
                 </Reveal>
             )}
 

@@ -132,7 +132,7 @@ return [
     'statuses' => [
         'live' => ['label' => 'Live', 'class' => 'text-accent border-accent/40 bg-accent/10'],
         'wip' => ['label' => 'Work in progress', 'class' => 'text-amber-300 border-amber-300/40 bg-amber-300/10'],
-        'private' => ['label' => 'Private project', 'class' => 'text-muted-foreground border-white/15 bg-white/5'],
+        'private' => ['label' => 'Private project', 'class' => 'text-muted-foreground border-hairline bg-surface-2'],
     ],
 
 ];
