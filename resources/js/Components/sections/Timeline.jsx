@@ -19,7 +19,7 @@ export function Timeline({ items, id, label = 'Experience' }) {
     const scaleY = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
     return (
-        <section id={id} className="scroll-mt-24 section-pad">
+        <section id={id} className="scroll-mt-24 section-pad-compact">
             <Container>
                 <SectionHeading
                     label={label}

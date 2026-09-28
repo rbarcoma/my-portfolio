@@ -85,7 +85,7 @@ export function Footer({ socials = [], portfolio = {} }) {
     }, [url]);
 
     return (
-        <footer className="relative mt-32 overflow-hidden border-t border-hairline">
+        <footer className="relative mt-0 overflow-hidden border-t border-hairline">
             <p
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 font-display text-[clamp(4rem,18vw,14rem)] leading-none font-bold whitespace-nowrap text-foreground/3 select-none"
@@ -93,7 +93,7 @@ export function Footer({ socials = [], portfolio = {} }) {
                 {portfolio.name ?? 'Renante Barcoma'}
             </p>
 
-            <Container className="relative py-16">
+            <Container className="relative py-12 sm:py-14">
                 <div className="grid gap-12 lg:grid-cols-12">
                     <div className="lg:col-span-5">
                         <p className="font-display text-2xl">{portfolio.name}</p>
@@ -153,7 +153,7 @@ export function Footer({ socials = [], portfolio = {} }) {
                     </div>
                 </div>
 
-                <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center">
+                <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center">
                     <p className="font-mono text-xs tracking-wider text-subtle">
                         © {year} {portfolio.name} — built with Laravel, Inertia & React
                     </p>

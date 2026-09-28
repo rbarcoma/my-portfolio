@@ -15,7 +15,6 @@ import { ContactForm } from '../Components/sections/ContactForm';
 
 export default function Home({ hero, stats, about, groups, projects, timeline, contact, statuses, github }) {
     const { socials = [] } = usePage().props;
-    const total = groups.reduce((count, group) => count + group.skills.length, 0);
 
     return (
         <>
@@ -29,12 +28,12 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
 
             <StatsBand stats={stats} github={github} />
 
-            <section id="skills" className="scroll-mt-24 section-pad">
+            <section id="skills" className="scroll-mt-24 section-pad-compact">
                 <Container>
                     <SectionHeading
-                        label="Skills"
-                        title="The toolkit behind the work."
-                        lead={total + ' tools across frontend, backend, data, DevOps and design — grouped by how I actually use them.'}
+                        label="Capabilities"
+                        title="Skills"
+                        lead="Hover or select a discipline to explore the technologies behind the work."
                     />
 
                     <div className="mt-12">
@@ -49,7 +48,7 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
 
             <Timeline items={timeline} id="experience" />
 
-            <section id="contact" className="scroll-mt-24 section-pad">
+            <section id="contact" className="scroll-mt-24 section-pad-compact">
                 <Container>
                     <SectionHeading label="Contact" title={contact.headline} lead={contact.lead} />
 

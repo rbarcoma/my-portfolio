@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -17,10 +16,6 @@ const EASE = [0.16, 1, 0.3, 1];
 export function RootLayout({ children }) {
     const { url, component, props } = usePage();
     const reduced = useReducedMotion();
-
-    useEffect(() => {
-        document.title = `${props.appName ?? 'Portfolio'} — ${props.portfolio?.role ?? ''}`.trim();
-    }, [props.appName, props.portfolio?.role]);
 
     return (
         <TooltipProvider>

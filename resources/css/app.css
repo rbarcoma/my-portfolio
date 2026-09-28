@@ -143,6 +143,10 @@
     .section-pad {
         @apply py-24 sm:py-28 lg:py-32;
     }
+
+    .section-pad-compact {
+        @apply py-12 sm:py-16 lg:py-20;
+    }
 }
 
 @keyframes marquee-x {

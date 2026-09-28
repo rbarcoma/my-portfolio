@@ -44,6 +44,12 @@ class PortfolioPagesTest extends TestCase
             );
     }
 
+    public function test_home_page_uses_the_portfolio_browser_title(): void
+    {
+        $this->get(route('home'))
+            ->assertSee('Renante Barcoma | Full-Stack Developer');
+    }
+
     public function test_legacy_section_urls_redirect_to_their_home_anchors(): void
     {
         $sections = [

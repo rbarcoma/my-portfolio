@@ -87,6 +87,7 @@ return [
         [
             'id' => 'frontend',
             'label' => 'Frontend',
+            'description' => 'Responsive interfaces and component systems that feel as good as they perform.',
             'skills' => [
                 ['name' => 'HTML', 'icon' => 'html5', 'color' => 'E34F26'],
                 ['name' => 'CSS', 'icon' => 'css', 'color' => '1572B6'],
@@ -101,6 +102,7 @@ return [
         [
             'id' => 'backend',
             'label' => 'Backend',
+            'description' => 'Application logic, APIs, and authentication that scale with the product.',
             'skills' => [
                 ['name' => 'PHP', 'icon' => 'php', 'color' => '777BB4'],
                 ['name' => 'Laravel', 'icon' => 'laravel', 'color' => 'FF2D20'],
@@ -112,6 +114,7 @@ return [
         [
             'id' => 'database',
             'label' => 'Database',
+            'description' => 'Structured data models and queries designed for reliable, useful software.',
             'skills' => [
                 ['name' => 'MySQL', 'icon' => 'mysql', 'color' => '4479A1'],
             ],
@@ -119,6 +122,7 @@ return [
         [
             'id' => 'tools',
             'label' => 'DevOps and Tools',
+            'description' => 'Versioning, local tooling, and delivery workflows that keep projects moving.',
             'skills' => [
                 ['name' => 'Git', 'icon' => 'git', 'color' => 'F05032'],
                 ['name' => 'GitHub', 'icon' => 'github', 'color' => '111827'],
@@ -131,6 +135,7 @@ return [
         [
             'id' => 'design',
             'label' => 'Design',
+            'description' => 'Visual systems and collaboration tools that turn ideas into clear interfaces.',
             'skills' => [
                 ['name' => 'Canva', 'icon' => 'canva', 'color' => '00C4CC'],
                 ['name' => 'Figma', 'icon' => 'figma', 'color' => 'F24E1E'],

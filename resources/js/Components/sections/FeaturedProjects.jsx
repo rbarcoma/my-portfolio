@@ -5,7 +5,7 @@ import { ProjectCard } from './ProjectCard';
 
 export function FeaturedProjects({ projects, statuses, id = 'projects' }) {
     return (
-        <section id={id} className="scroll-mt-24 section-pad">
+        <section id={id} className="scroll-mt-24 section-pad-compact">
             <Container>
                 <SectionHeading
                     label="Selected Work"

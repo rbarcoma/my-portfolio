@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useRoute } from '../../lib/route';
 import { Button } from '../ui/button';
@@ -39,7 +39,7 @@ export function Hero({ hero }) {
                                     delay={0.1 + index * 0.15}
                                     className={
                                         index === HEADLINE_WORDS.length - 1
-                                            ? 'bg-gradient-to-r from-accent via-accent to-secondary bg-clip-text text-transparent'
+                                            ? 'bg-accent px-[0.08em] text-base'
                                             : undefined
                                     }
                                 />
@@ -80,23 +80,6 @@ export function Hero({ hero }) {
                 </div>
             </Container>
 
-            <motion.div
-                aria-hidden="true"
-                initial={reduced ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.1, duration: 0.6 }}
-                className="absolute inset-x-0 bottom-6 flex justify-center"
-            >
-                <span className="flex flex-col items-center gap-2 font-mono text-[0.65rem] tracking-[0.3em] text-subtle uppercase">
-                    Scroll
-                    <motion.span
-                        animate={reduced ? undefined : { y: [0, 6, 0] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                    >
-                        <ArrowDown className="size-4" />
-                    </motion.span>
-                </span>
-            </motion.div>
         </section>
     );
 }

@@ -5,16 +5,14 @@ import { SkillsGrid } from '../Components/sections/SkillsGrid';
 import { CtaBand } from '../Components/sections/CtaBand';
 
 export default function Skills({ groups }) {
-    const total = groups.reduce((count, group) => count + group.skills.length, 0);
-
     return (
         <>
             <Head title="Skills" />
 
             <PageHeader
-                eyebrow="Skills"
-                title="The toolkit behind the work."
-                lead={`${total} tools across frontend, backend, infrastructure and design — grouped by how I actually use them.`}
+                eyebrow="Capabilities"
+                title="Skills"
+                lead="Hover or select a discipline to explore the technologies behind the work."
             />
 
             <section className="pb-24 sm:pb-32">

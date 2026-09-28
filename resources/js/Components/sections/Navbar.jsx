@@ -45,7 +45,7 @@ export function Navbar() {
     const route = useRoute();
     const { url, props } = usePage();
     const pathname = url.split(/[?#]/)[0];
-    const { direction, offset } = useScrollDirection();
+    const { offset } = useScrollDirection();
     const isDesktop = useIsDesktop();
     const [open, setOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
@@ -53,7 +53,6 @@ export function Navbar() {
 
     const sectionHref = (id) => route('home') + '#' + id;
     const condensed = offset > 40;
-    const hidden = direction === 'down' && offset > 160 && !open;
 
     useEffect(() => {
         const storedTheme = window.localStorage.getItem('portfolio-theme');
@@ -139,12 +138,7 @@ export function Navbar() {
     };
 
     return (
-        <motion.header
-            initial={false}
-            animate={{ y: hidden ? '-110%' : '0%' }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-x-0 top-0 z-40"
-        >
+        <header className="fixed inset-x-0 top-0 z-40">
             <div
                 className={cn(
                     'transition-all duration-300 ease-[var(--ease-out-expo)]',
@@ -154,12 +148,10 @@ export function Navbar() {
                 <nav aria-label="Primary" className="container-page flex h-16 items-center justify-between gap-6 sm:h-18">
                     <a
                         href={sectionHref('home')}
-                        className="group flex items-baseline gap-2 font-display text-sm tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                        aria-label="Renante Barcoma home"
+                        className="font-display text-sm tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                     >
                         <span className="text-lg font-bold">RB</span>
-                        <span className="hidden font-mono text-[0.7rem] tracking-[0.2em] text-subtle uppercase sm:inline">
-                            {props.portfolio?.name ?? 'Portfolio'}
-                        </span>
                     </a>
 
                     {isDesktop && (
@@ -256,7 +248,7 @@ export function Navbar() {
                     </Sheet>
                 )}
             </AnimatePresence>
-        </motion.header>
+        </header>
     );
 }
 

@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <title inertia>{{ config('app.name') }}</title>
+        <title inertia>{{ config('portfolio.name') }} | {{ config('portfolio.role') }}</title>
 
         <meta name="description" content="{{ config('portfolio.meta_description') }}" />
         <meta name="author" content="{{ config('portfolio.name') }}" />
