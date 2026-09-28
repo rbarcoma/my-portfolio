@@ -145,7 +145,7 @@ export function Navbar() {
                     condensed && 'border-b border-hairline bg-base/80 backdrop-blur-xl',
                 )}
             >
-                <nav aria-label="Primary" className="container-page flex h-16 items-center justify-between gap-6 sm:h-18">
+                <nav aria-label="Primary" className="container-page flex h-16 items-center gap-6 sm:h-18">
                     <a
                         href={sectionHref('home')}
                         aria-label="Renante Barcoma home"
@@ -154,57 +154,59 @@ export function Navbar() {
                         <span className="text-lg font-bold">RB</span>
                     </a>
 
-                    {isDesktop && (
-                        <ul className="flex items-center gap-1">
-                            {LINKS.map((link) => {
-                                const current = pathname === '/' && activeSection === link.id;
+                    <div className="ml-auto flex shrink-0 items-center gap-2">
+                        {isDesktop && (
+                            <ul className="flex items-center gap-1">
+                                {LINKS.map((link) => {
+                                    const current = pathname === '/' && activeSection === link.id;
 
-                                return (
-                                    <li key={link.id}>
-                                        <a
-                                            href={sectionHref(link.id)}
-                                            aria-current={current ? 'location' : undefined}
-                                            data-cursor="hover"
-                                            className={cn(
-                                                'relative block rounded-full px-4 py-2 text-sm transition-colors duration-200',
-                                                current
-                                                    ? 'text-foreground'
-                                                    : 'text-muted-foreground hover:text-foreground',
-                                            )}
-                                        >
-                                            {current && (
-                                                <motion.span
-                                                    layoutId="nav-active"
-                                                    className="absolute inset-0 -z-10 rounded-full border border-hairline bg-surface"
-                                                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                                                />
-                                            )}
-                                            {link.label}
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-
-                    <div className="flex shrink-0 items-center gap-2">
-                        <div className="hidden sm:block">
-                            <CvButton cv={props.cv} size="sm" label="Download CV" />
-                        </div>
-
-                        <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-
-                        {!isDesktop && (
-                            <button
-                                type="button"
-                                onClick={() => setOpen(true)}
-                                aria-label="Open menu"
-                                aria-expanded={open}
-                                className="inline-flex size-10 items-center justify-center rounded-full border border-hairline text-foreground transition-colors hover:bg-surface-2"
-                            >
-                                <Menu className="size-5" aria-hidden="true" />
-                            </button>
+                                    return (
+                                        <li key={link.id}>
+                                            <a
+                                                href={sectionHref(link.id)}
+                                                aria-current={current ? 'location' : undefined}
+                                                data-cursor="hover"
+                                                className={cn(
+                                                    'relative block rounded-full px-4 py-2 text-sm transition-colors duration-200',
+                                                    current
+                                                        ? 'text-foreground'
+                                                        : 'text-muted-foreground hover:text-foreground',
+                                                )}
+                                            >
+                                                {current && (
+                                                    <motion.span
+                                                        layoutId="nav-active"
+                                                        className="absolute inset-0 -z-10 rounded-full border border-hairline bg-surface"
+                                                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                                                    />
+                                                )}
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                         )}
+
+                        <div className="flex shrink-0 items-center gap-2">
+                            <div className="hidden sm:block">
+                                <CvButton cv={props.cv} size="sm" label="Download CV" />
+                            </div>
+
+                            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+
+                            {!isDesktop && (
+                                <button
+                                    type="button"
+                                    onClick={() => setOpen(true)}
+                                    aria-label="Open menu"
+                                    aria-expanded={open}
+                                    className="inline-flex size-10 items-center justify-center rounded-full border border-hairline text-foreground transition-colors hover:bg-surface-2"
+                                >
+                                    <Menu className="size-5" aria-hidden="true" />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </nav>
             </div>

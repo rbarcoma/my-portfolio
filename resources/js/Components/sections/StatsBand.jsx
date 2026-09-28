@@ -3,7 +3,7 @@ import { Container } from '../common/Container';
 import { RevealGroup, RevealItem } from '../common/Reveal';
 
 /**
- * Stats band. A stat with `source: 'github'` uses the live commit count.
+ * Stats band. A stat with `source: 'github'` uses the live contribution count.
  */
 export function StatsBand({ stats, github }) {
     const resolved = (stat) => {

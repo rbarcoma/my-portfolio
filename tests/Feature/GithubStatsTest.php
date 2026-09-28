@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\GitHubService;
-use Carbon\Carbon;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -11,23 +11,42 @@ use Tests\TestCase;
 class GithubStatsTest extends TestCase
 {
     /**
-     * The live endpoint returns days newest-first; keep the fixtures honest.
-     *
-     * @param  array<string, int>  $counts  Date => contribution count.
-     * @return array{total: array<string, int>, contributions: list<array{count: int, date: string}>}
+     * @param  list<array<string, mixed>>  $weeks
+     * @return array<string, mixed>
      */
-    private function contributionPayload(array $counts): array
+    private function contributionCalendarPayload(int $total, array $weeks): array
     {
-        $days = [];
-
-        foreach ($counts as $date => $count) {
-            $days[] = ['count' => $count, 'date' => $date];
-        }
-
         return [
-            'total' => [],
-            'contributions' => array_reverse($days),
+            'data' => [
+                'user' => [
+                    'contributionsCollection' => [
+                        'contributionCalendar' => [
+                            'totalContributions' => $total,
+                            'weeks' => $weeks,
+                        ],
+                    ],
+                ],
+            ],
         ];
+    }
+
+    private function configureGithub(?string $token = null, ?string $webhookSecret = null): void
+    {
+        config([
+            'portfolio.github_username' => 'octocat',
+            'services.github.token' => $token,
+            'services.github.webhook_secret' => $webhookSecret,
+        ]);
+    }
+
+    private function webhookPayload(): string
+    {
+        return '{"repository":{"full_name":"octocat/portfolio"}}';
+    }
+
+    private function webhookSignature(string $payload, string $secret = 'webhook-secret'): string
+    {
+        return 'sha256='.hash_hmac('sha256', $payload, $secret);
     }
 
     public function test_endpoint_returns_json_with_the_configured_username(): void
@@ -35,10 +54,12 @@ class GithubStatsTest extends TestCase
         Http::preventStrayRequests();
         Http::fake(['*' => Http::response(null, 503)]);
 
-        config(['portfolio.github_username' => 'octocat']);
+        Cache::flush();
+        $this->configureGithub();
 
         $this->get(route('github.stats'))
             ->assertOk()
+            ->assertHeaderContains('Cache-Control', 'no-store')
             ->assertJsonPath('username', 'octocat')
             ->assertJsonPath('available', false)
             ->assertJsonPath('repos', [])
@@ -65,7 +86,7 @@ class GithubStatsTest extends TestCase
         ]);
 
         Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
+        $this->configureGithub();
 
         $this->getJson(route('github.stats'))
             ->assertJsonPath('available', true)
@@ -99,110 +120,151 @@ class GithubStatsTest extends TestCase
         $this->assertSame('#F7523F', $blade['color']);
     }
 
-    public function test_contributions_are_totalled_per_year(): void
+    public function test_contributions_are_mapped_from_the_official_github_calendar(): void
     {
-        $this->travelTo(now()->startOfYear()->addMonths(2)->startOfDay());
+        $year = now()->year;
 
         Http::preventStrayRequests();
         Http::fake([
-            'github-contributions-api.jogruber.de/*' => Http::response($this->contributionPayload([
-                now()->subDay()->toDateString() => 1,
-                now()->toDateString() => 2,
-                now()->subYear()->toDateString() => 5,
+            'api.github.com/graphql' => Http::response($this->contributionCalendarPayload(10, [
+                [
+                    'contributionDays' => [
+                        ['contributionCount' => 4, 'date' => ($year - 1).'-12-31', 'weekday' => 0],
+                        ['contributionCount' => 2, 'date' => $year.'-01-01', 'weekday' => 4],
+                    ],
+                ],
+                [
+                    'contributionDays' => [
+                        ['contributionCount' => 1, 'date' => $year.'-01-04', 'weekday' => 0],
+                        ['contributionCount' => 3, 'date' => $year.'-01-06', 'weekday' => 2],
+                    ],
+                ],
             ])),
-            '*' => Http::response(null, 503),
         ]);
 
         Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
-
-        $contributions = $this->app->make(GitHubService::class)->contributions('octocat');
-
-        $this->assertNotNull($contributions);
-        $this->assertSame(8, $contributions['total']);
-        $this->assertSame(3, $contributions['this_year']);
-
-        foreach ($contributions['weeks'] as $week) {
-            $this->assertCount(7, $week);
-        }
-    }
-
-    public function test_contribution_days_are_grouped_into_sunday_first_columns(): void
-    {
-        $wednesday = now()->subWeeks(2)->startOfWeek(Carbon::SUNDAY)->addDays(3);
-
-        Http::preventStrayRequests();
-        Http::fake([
-            'github-contributions-api.jogruber.de/*' => Http::response($this->contributionPayload([
-                $wednesday->toDateString() => 3,
-                $wednesday->copy()->addDay()->toDateString() => 1,
-                $wednesday->copy()->addDays(2)->toDateString() => 2,
-                $wednesday->copy()->addDays(3)->toDateString() => 0,
-                $wednesday->copy()->addDays(4)->toDateString() => 4,
-            ])),
-            '*' => Http::response(null, 503),
-        ]);
-
-        Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
+        $this->configureGithub(token: 'github-token');
 
         $contributions = $this->app->make(GitHubService::class)->contributions('octocat');
 
         $this->assertNotNull($contributions);
         $this->assertSame(10, $contributions['total']);
-        $this->assertSame([[0, 0, 0, 3, 1, 2, 0], [4, 0, 0, 0, 0, 0, 0]], $contributions['weeks']);
+        $this->assertSame(6, $contributions['this_year']);
+        $this->assertSame([
+            [4, 0, 0, 0, 2, 0, 0],
+            [1, 0, 3, 0, 0, 0, 0],
+        ], $contributions['weeks']);
+
+        Http::assertSent(function (Request $request): bool {
+            return $request->method() === 'POST'
+                && $request->url() === 'https://api.github.com/graphql'
+                && $request->hasHeader('Authorization', 'Bearer github-token')
+                && $request->data()['variables']['login'] === 'octocat';
+        });
     }
 
-    public function test_days_after_today_are_dropped_so_the_graph_ends_on_the_current_week(): void
+    public function test_stats_remain_available_when_the_official_calendar_is_available(): void
     {
         Http::preventStrayRequests();
         Http::fake([
-            'github-contributions-api.jogruber.de/*' => Http::response($this->contributionPayload([
-                now()->toDateString() => 2,
-                now()->addDay()->toDateString() => 9,
-                now()->addWeek()->toDateString() => 9,
+            'api.github.com/graphql' => Http::response($this->contributionCalendarPayload(3, [
+                [
+                    'contributionDays' => [
+                        ['contributionCount' => 3, 'date' => now()->toDateString(), 'weekday' => now()->dayOfWeek],
+                    ],
+                ],
             ])),
             '*' => Http::response(null, 503),
         ]);
 
         Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
+        $this->configureGithub(token: 'github-token');
+
+        $stats = $this->app->make(GitHubService::class)->stats();
+
+        $this->assertTrue($stats['available']);
+        $this->assertNull($stats['profile']);
+        $this->assertSame(3, $stats['contributions']['total']);
+    }
+
+    public function test_contributions_are_unavailable_without_a_github_token(): void
+    {
+        Http::preventStrayRequests();
+        Cache::flush();
+        $this->configureGithub();
 
         $contributions = $this->app->make(GitHubService::class)->contributions('octocat');
 
-        $this->assertNotNull($contributions);
-        $this->assertSame(2, $contributions['total']);
-        $this->assertCount(1, $contributions['weeks']);
+        $this->assertNull($contributions);
+        Http::assertNothingSent();
     }
 
-    public function test_contributions_understand_the_legacy_week_payload(): void
+    public function test_graphql_errors_degrade_to_unavailable_contributions(): void
     {
-        $wednesday = now()->subWeeks(2)->startOfWeek(Carbon::SUNDAY)->addDays(3);
-
         Http::preventStrayRequests();
         Http::fake([
-            'github-contributions-api.jogruber.de/*' => Http::response([
-                [
-                    'days' => [
-                        ['count' => 3, 'date' => $wednesday->toDateString()],
-                        ['count' => 1, 'date' => $wednesday->copy()->addDay()->toDateString()],
-                        ['count' => 0, 'date' => $wednesday->copy()->addDays(2)->toDateString()],
-                        ['count' => 0, 'date' => $wednesday->copy()->addDays(3)->toDateString()],
-                        ['count' => 4, 'date' => $wednesday->copy()->addDays(4)->toDateString()],
-                    ],
-                ],
+            'api.github.com/graphql' => Http::response([
+                'errors' => [['message' => 'Bad credentials']],
             ]),
-            '*' => Http::response(null, 503),
         ]);
 
         Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
+        $this->configureGithub(token: 'github-token');
 
         $contributions = $this->app->make(GitHubService::class)->contributions('octocat');
 
-        $this->assertNotNull($contributions);
-        $this->assertSame(8, $contributions['total']);
-        $this->assertSame([[0, 0, 0, 3, 1, 0, 0], [4, 0, 0, 0, 0, 0, 0]], $contributions['weeks']);
+        $this->assertNull($contributions);
+    }
+
+    public function test_push_webhook_invalidates_the_contribution_cache(): void
+    {
+        Cache::flush();
+        $this->configureGithub(webhookSecret: 'webhook-secret');
+        Cache::put('github.contributions.octocat', ['total' => 10], 30);
+
+        $payload = $this->webhookPayload();
+
+        $this->call('POST', route('github.webhook'), [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_GITHUB_EVENT' => 'push',
+            'HTTP_X_HUB_SIGNATURE_256' => $this->webhookSignature($payload),
+        ], $payload)->assertNoContent();
+
+        $this->assertFalse(Cache::has('github.contributions.octocat'));
+    }
+
+    public function test_webhook_rejects_an_invalid_signature_without_invalidating_the_cache(): void
+    {
+        Cache::flush();
+        $this->configureGithub(webhookSecret: 'webhook-secret');
+        Cache::put('github.contributions.octocat', ['total' => 10], 30);
+
+        $payload = $this->webhookPayload();
+
+        $this->call('POST', route('github.webhook'), [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_GITHUB_EVENT' => 'push',
+            'HTTP_X_HUB_SIGNATURE_256' => 'sha256=invalid',
+        ], $payload)->assertForbidden();
+
+        $this->assertTrue(Cache::has('github.contributions.octocat'));
+    }
+
+    public function test_non_push_webhooks_leave_the_contribution_cache_intact(): void
+    {
+        Cache::flush();
+        $this->configureGithub(webhookSecret: 'webhook-secret');
+        Cache::put('github.contributions.octocat', ['total' => 10], 30);
+
+        $payload = $this->webhookPayload();
+
+        $this->call('POST', route('github.webhook'), [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_GITHUB_EVENT' => 'ping',
+            'HTTP_X_HUB_SIGNATURE_256' => $this->webhookSignature($payload),
+        ], $payload)->assertNoContent();
+
+        $this->assertTrue(Cache::has('github.contributions.octocat'));
     }
 
     public function test_upstream_failures_degrade_to_an_unavailable_payload(): void
@@ -211,12 +273,13 @@ class GithubStatsTest extends TestCase
         Http::fake(['*' => Http::response('boom', 500)]);
 
         Cache::flush();
-        config(['portfolio.github_username' => 'octocat']);
+        $this->configureGithub(token: 'github-token');
 
         $stats = $this->app->make(GitHubService::class)->stats();
 
         $this->assertFalse($stats['available']);
         $this->assertNull($stats['profile']);
         $this->assertSame([], $stats['repos']);
+        $this->assertNull($stats['contributions']);
     }
 }

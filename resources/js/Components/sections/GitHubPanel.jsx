@@ -95,13 +95,13 @@ function GithubContent({ github, compact, embedded }) {
                                 {contributions.this_year} contributions this year
                             </p>
                             <a
-                                href={profile?.url}
+                                href={profile?.url ?? `https://github.com/${github.username}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 data-cursor="hover"
                                 className="inline-flex items-center gap-2 text-sm text-accent underline-offset-4 hover:underline"
                             >
-                                @{profile?.login}
+                                @{profile?.login ?? github.username}
                                 <ExternalLink className="size-3.5" aria-hidden="true" />
                             </a>
                         </div>

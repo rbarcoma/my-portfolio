@@ -2,22 +2,19 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class GitHubService
 {
-    /**
-     * Contribution heatmaps are expensive to build server-side, so the cache
-     * window is intentionally longer than the profile/repo windows.
-     */
     private const PROFILE_TTL = 21600;
 
     private const REPOS_TTL = 21600;
 
-    private const CONTRIBUTIONS_TTL = 43200;
+    private const CONTRIBUTIONS_TTL = 30;
+
+    private const CONTRIBUTION_RANGE_DAYS = 365;
 
     /**
      * @return array{
@@ -38,14 +35,15 @@ class GitHubService
         }
 
         $profile = $this->profile($username);
+        $contributions = $this->contributions($username);
 
         return [
             'username' => $username,
-            'available' => $profile !== null,
+            'available' => $profile !== null || $contributions !== null,
             'profile' => $profile,
             'repos' => $this->repos($username),
             'languages' => $this->languages($username),
-            'contributions' => $this->contributions($username),
+            'contributions' => $contributions,
         ];
     }
 
@@ -157,96 +155,153 @@ class GitHubService
     }
 
     /**
-     * Contribution weeks come from a community endpoint; failures are expected
-     * and simply produce the static fallback in the UI.
-     *
      * @return array{weeks: list<list<int>>, total: int, this_year: int}|null
      */
     public function contributions(string $username): ?array
     {
-        return Cache::remember("github.contributions.{$username}", self::CONTRIBUTIONS_TTL, function () use ($username): ?array {
-            $days = $this->contributionDays(
-                $this->getJson("https://github-contributions-api.jogruber.de/v4/{$username}") ?? []
-            );
+        return Cache::remember($this->contributionCacheKey($username), self::CONTRIBUTIONS_TTL, function () use ($username): ?array {
+            $calendar = $this->contributionCalendar($username);
 
-            if ($days === []) {
+            if ($calendar === null) {
                 return null;
             }
 
             $year = (int) now()->format('Y');
             $thisYear = 0;
+            $weeks = [];
 
-            foreach ($days as $day) {
-                if ((int) substr($day['date'], 0, 4) === $year) {
-                    $thisYear += $day['count'];
+            foreach ($calendar['weeks'] ?? [] as $week) {
+                if (! is_array($week)) {
+                    continue;
                 }
+
+                $counts = array_fill(0, 7, 0);
+
+                foreach ($week['contributionDays'] ?? [] as $day) {
+                    if (! is_array($day)) {
+                        continue;
+                    }
+
+                    $weekday = (int) ($day['weekday'] ?? -1);
+                    $count = (int) ($day['contributionCount'] ?? 0);
+                    $date = $day['date'] ?? null;
+
+                    if ($weekday >= 0 && $weekday < 7) {
+                        $counts[$weekday] = $count;
+                    }
+
+                    if (is_string($date) && (int) substr($date, 0, 4) === $year) {
+                        $thisYear += $count;
+                    }
+                }
+
+                $weeks[] = $counts;
+            }
+
+            if ($weeks === []) {
+                return null;
             }
 
             return [
-                'weeks' => $this->contributionWeeks($days),
-                'total' => array_sum(array_column($days, 'count')),
+                'weeks' => $weeks,
+                'total' => (int) ($calendar['totalContributions'] ?? 0),
                 'this_year' => $thisYear,
             ];
         });
     }
 
     /**
-     * The upstream endpoint has reshaped its payload between major versions:
-     * v4 returns a flat list of days, older ones nested them inside week
-     * objects. Both are normalised to one ascending, de-duplicated list that
-     * stops at today, so the graph never trails empty future columns.
-     *
-     * @param  array<array-key, mixed>  $payload
-     * @return list<array{date: string, count: int}>
+     * Forget the official contribution calendar after a verified push webhook.
      */
-    private function contributionDays(array $payload): array
+    public function forgetContributions(string $username): void
     {
-        $days = $payload['contributions'] ?? [];
-
-        if (! is_array($days) || $days === []) {
-            $days = array_merge(
-                ...array_map(fn (mixed $week): array => is_array($week) ? ($week['days'] ?? []) : [], $payload)
-            );
-        }
-
-        $today = now()->format('Y-m-d');
-        $counts = [];
-
-        foreach ($days as $day) {
-            $date = is_array($day) ? ($day['date'] ?? null) : null;
-
-            if (is_string($date) && $date !== '' && $date <= $today) {
-                $counts[$date] = (int) ($day['count'] ?? 0);
-            }
-        }
-
-        ksort($counts);
-
-        return array_map(
-            fn (string $date, int $count): array => ['date' => $date, 'count' => $count],
-            array_keys($counts),
-            array_values($counts),
-        );
+        Cache::forget($this->contributionCacheKey($username));
     }
 
     /**
-     * Columns of seven days, Sunday first, padded so every column lines up
-     * with a weekday exactly like the GitHub profile heatmap.
-     *
-     * @param  list<array{date: string, count: int}>  $days
-     * @return list<list<int>>
+     * Verify GitHub's HMAC-SHA256 signature against the unmodified body.
      */
-    private function contributionWeeks(array $days): array
+    public function hasValidWebhookSignature(string $payload, ?string $signature): bool
     {
-        $leading = Carbon::parse($days[0]['date'])->dayOfWeek;
-        $cells = array_merge(array_fill(0, $leading, 0), array_column($days, 'count'));
-        $trailing = (7 - count($cells) % 7) % 7;
+        $secret = config('services.github.webhook_secret');
 
-        if ($trailing > 0) {
-            $cells = array_merge($cells, array_fill(0, $trailing, 0));
+        if (! is_string($secret) || $secret === '' || ! is_string($signature)) {
+            return false;
         }
 
-        return array_chunk($cells, 7);
+        $expected = 'sha256='.hash_hmac('sha256', $payload, $secret);
+
+        return hash_equals($expected, $signature);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function contributionCalendar(string $username): ?array
+    {
+        $token = config('services.github.token');
+
+        if (! is_string($token) || $token === '') {
+            return null;
+        }
+
+        $to = now()->endOfDay();
+        $from = $to->copy()->subDays(self::CONTRIBUTION_RANGE_DAYS - 1)->startOfDay();
+
+        try {
+            $response = Http::acceptJson()
+                ->withToken($token)
+                ->withHeaders(['User-Agent' => config('app.name').' portfolio'])
+                ->connectTimeout(3)
+                ->timeout(5)
+                ->post('https://api.github.com/graphql', [
+                    'query' => <<<'GRAPHQL'
+                        query ContributionCalendar($login: String!, $from: DateTime!, $to: DateTime!) {
+                          user(login: $login) {
+                            contributionsCollection(from: $from, to: $to) {
+                              contributionCalendar {
+                                totalContributions
+                                weeks {
+                                  contributionDays {
+                                    contributionCount
+                                    date
+                                    weekday
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                        GRAPHQL,
+                    'variables' => [
+                        'login' => $username,
+                        'from' => $from->toIso8601String(),
+                        'to' => $to->toIso8601String(),
+                    ],
+                ]);
+
+            if (! $response->successful() || ! empty($response->json('errors'))) {
+                Log::info('GitHub GraphQL request failed.', [
+                    'status' => $response->status(),
+                    'has_errors' => ! empty($response->json('errors')),
+                ]);
+
+                return null;
+            }
+
+            $calendar = $response->json('data.user.contributionsCollection.contributionCalendar');
+
+            return is_array($calendar) ? $calendar : null;
+        } catch (\Throwable $exception) {
+            Log::info('GitHub GraphQL request errored.', ['exception' => $exception->getMessage()]);
+
+            return null;
+        }
+    }
+
+    private function contributionCacheKey(string $username): string
+    {
+        return "github.contributions.{$username}";
     }
 
     /**
@@ -255,11 +310,19 @@ class GitHubService
      */
     private function getJson(string $url, array $query = []): ?array
     {
+        $token = config('services.github.token');
+
         try {
-            $response = Http::acceptJson()
+            $request = Http::acceptJson()
                 ->withHeaders(['User-Agent' => config('app.name').' portfolio'])
-                ->timeout(5)
-                ->get($url, $query);
+                ->connectTimeout(3)
+                ->timeout(5);
+
+            if (is_string($token) && $token !== '') {
+                $request = $request->withToken($token);
+            }
+
+            $response = $request->get($url, $query);
 
             if (! $response->successful()) {
                 Log::info('GitHub request failed.', ['url' => $url, 'status' => $response->status()]);

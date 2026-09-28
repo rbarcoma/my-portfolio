@@ -1,7 +1,7 @@
 import { ArrowDownToLine, Lock } from 'lucide-react';
+import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 import { ClickSpark } from '../reactbits/ClickSpark';
-import { ShinyText } from '../reactbits/ShinyText';
 
 /**
  * CV download CTA. Download attribute keeps the browser on the page;
@@ -14,10 +14,10 @@ export function CvButton({ cv, className, size = 'md', label }) {
 
     return (
         <ClickSpark>
-            <Button asChild size={size} className={className}>
+            <Button asChild size={size} className={cn('text-black', className)}>
                 <a href={`/cv`} download={cv.filename} data-cursor="hover">
                     <ArrowDownToLine aria-hidden="true" />
-                    <ShinyText>{label ?? cv.label ?? 'Download CV'}</ShinyText>
+                    <span>{label ?? cv.label ?? 'Download CV'}</span>
                 </a>
             </Button>
         </ClickSpark>

@@ -12,9 +12,13 @@ import { GithubPanel } from '../Components/sections/GitHubPanel';
 import { SkillsGrid } from '../Components/sections/SkillsGrid';
 import { Timeline } from '../Components/sections/Timeline';
 import { ContactForm } from '../Components/sections/ContactForm';
+import { useGithubStats } from '../hooks/useGithubStats';
+import { useRoute } from '../lib/route';
 
 export default function Home({ hero, stats, about, groups, projects, timeline, contact, statuses, github }) {
     const { socials = [] } = usePage().props;
+    const route = useRoute();
+    const liveGithub = useGithubStats(github, route('github.stats'));
 
     return (
         <>
@@ -26,7 +30,7 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
 
             <AboutTeaser about={about} id="about" />
 
-            <StatsBand stats={stats} github={github} />
+            <StatsBand stats={stats} github={liveGithub} />
 
             <section id="skills" className="scroll-mt-24 section-pad-compact">
                 <Container>
@@ -40,7 +44,7 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
                         <SkillsGrid groups={groups} />
                     </div>
 
-                    {github?.available && <GithubPanel github={github} embedded />}
+                    {liveGithub?.available && <GithubPanel github={liveGithub} embedded />}
                 </Container>
             </section>
 
