@@ -3,14 +3,14 @@ import { Container } from '../common/Container';
 import { RevealGroup, RevealItem } from '../common/Reveal';
 
 /**
- * Stats band. A stat with `source: 'github'` uses the live contribution count.
+ * A quiet summary of the experience, with live GitHub figures when available.
  */
 export function StatsBand({ stats, github }) {
     const resolved = (stat) => {
         if (stat.source === 'github') {
             return {
                 value: github?.contributions?.total ?? null,
-                label: 'Contributions on GitHub',
+                label: 'GitHub contributions',
             };
         }
 
@@ -18,20 +18,18 @@ export function StatsBand({ stats, github }) {
     };
 
     return (
-        <section className="border-y border-hairline bg-surface/30">
-            <Container className="py-14">
-                <RevealGroup className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+        <section className="border-y border-hairline bg-surface">
+            <Container>
+                <RevealGroup className="grid divide-y divide-hairline sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
                     {stats.map((stat) => {
                         const { value, label } = resolved(stat);
 
                         return (
-                            <RevealItem key={stat.label} className="flex flex-col gap-2">
-                                <span className="font-display text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-bold text-accent tabular-nums">
+                            <RevealItem key={stat.label} className="flex flex-col gap-2 py-7 sm:px-7 sm:first:pl-0 lg:py-9">
+                                <span className="font-display text-[clamp(2.25rem,4vw,3.4rem)] leading-none font-semibold tabular-nums">
                                     <CountUp value={value} suffix={stat.suffix ?? ''} />
                                 </span>
-                                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-muted-foreground uppercase">
-                                    {label}
-                                </span>
+                                <span className="text-sm text-muted-foreground">{label}</span>
                             </RevealItem>
                         );
                     })}

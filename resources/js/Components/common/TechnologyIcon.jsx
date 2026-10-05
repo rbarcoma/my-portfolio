@@ -52,7 +52,6 @@ export function TechnologyIcon({ skill, className }) {
                     decoding="async"
                     className={cn(
                         'absolute inset-0 h-full w-full object-contain',
-                        themeAware && 'dark:invert',
                     )}
                     onError={(event) => {
                         event.currentTarget.style.display = 'none';

@@ -12,8 +12,8 @@ export function Reveal({
     children,
     className,
     delay = 0,
-    y = 24,
-    duration = 0.5,
+    y = 8,
+    duration = 0.45,
     as = 'div',
     once = true,
     ...props
@@ -35,7 +35,7 @@ export function Reveal({
             className={className}
             initial={{ opacity: 0, y }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once, margin: '-15% 0px -10% 0px' }}
+            viewport={{ once, margin: '-10% 0px -8% 0px' }}
             transition={{ duration, delay, ease: EASE }}
             {...props}
         >
@@ -72,7 +72,7 @@ export function RevealGroup({ children, className, stagger = 0.08, delay = 0, ..
     );
 }
 
-export function RevealItem({ children, className, y = 20, ...props }) {
+export function RevealItem({ children, className, y = 8, ...props }) {
     const reduced = useReducedMotion();
 
     if (reduced) {
@@ -88,7 +88,7 @@ export function RevealItem({ children, className, y = 20, ...props }) {
             className={className}
             variants={{
                 hidden: { opacity: 0, y },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
             }}
             {...props}
         >

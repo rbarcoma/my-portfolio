@@ -15,38 +15,38 @@ const META_LABELS = { role: 'Role', year: 'Year' };
 
 export default function ProjectShow({ project, statuses, navigation, portfolio }) {
     const route = useRoute();
+    const hasProjectLinks = Boolean(project.links.live || project.links.repo || project.links.video);
+    const shouldShowPrivateProjectNotice = project.status === 'private' || !hasProjectLinks;
 
     return (
         <>
             <Head title={project.title} />
 
-            <article>
-                <header className="relative overflow-hidden pt-32 pb-12 sm:pt-40">
-                    <div aria-hidden="true" className="absolute inset-0 texture-grid opacity-40" />
-
-                    <Container className="relative">
+            <article className="bg-base">
+                <header className="border-b border-hairline pt-28 pb-12 sm:pt-36 sm:pb-16">
+                    <Container>
                         <a
                             href={route('home') + '#projects'}
                             data-cursor="hover"
-                            className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase transition-colors hover:text-accent"
+                            className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase transition-colors hover:text-foreground"
                         >
                             <ArrowLeft className="size-3.5" aria-hidden="true" />
                             All projects
                         </a>
 
-                        <div className="mt-8 grid gap-10 lg:grid-cols-12">
+                        <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-14">
                             <div className="lg:col-span-8">
                                 <StatusPill status={project.status} statuses={statuses} />
 
-                                <h1 className="mt-5 text-[clamp(2.25rem,6.5vw,5rem)] leading-[0.98] font-bold tracking-tight text-balance">
+                                <h1 className="mt-5 max-w-4xl text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[0.98] font-bold tracking-tight text-balance">
                                     {project.title}
                                 </h1>
 
-                                <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                                <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                                     {project.tagline}
                                 </p>
 
-                                <div className="mt-8 flex flex-wrap gap-2">
+                                <div className="mt-8 flex flex-wrap gap-2.5">
                                     {project.stack.map((tech) => (
                                         <TechBadge key={tech}>{tech}</TechBadge>
                                     ))}
@@ -55,21 +55,21 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
 
                             <aside className="lg:col-span-4">
                                 <Reveal>
-                                    <dl className="flex flex-col gap-5 rounded-card border border-hairline bg-surface/40 p-6">
+                                    <dl className="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-hairline pt-6 lg:grid-cols-1">
                                         {Object.entries(META_LABELS).map(([key, label]) => (
                                             <div key={key} className="flex flex-col gap-1">
-                                                <dt className="font-mono text-[0.65rem] tracking-[0.2em] text-subtle uppercase">
+                                                <dt className="text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
                                                     {label}
                                                 </dt>
-                                                <dd className="text-sm">{project[key]}</dd>
+                                                <dd className="text-sm text-foreground">{project[key]}</dd>
                                             </div>
                                         ))}
 
                                         <div className="flex flex-col gap-1">
-                                            <dt className="font-mono text-[0.65rem] tracking-[0.2em] text-subtle uppercase">
+                                            <dt className="text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
                                                 Stack
                                             </dt>
-                                            <dd className="text-sm">{project.stack.join(', ')}</dd>
+                                            <dd className="text-sm leading-relaxed text-foreground">{project.stack.join(', ')}</dd>
                                         </div>
                                     </dl>
                                 </Reveal>
@@ -78,9 +78,9 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                     </Container>
                 </header>
 
-                <Container>
+                <Container className="py-10 sm:py-14">
                     <Reveal>
-                        <div className="relative aspect-16/9 overflow-hidden rounded-card border border-hairline bg-elevated">
+                        <div className="relative aspect-16/9 overflow-hidden rounded-card border border-hairline bg-surface-2">
                             <img
                                 src={project.cover}
                                 alt={`${project.title} cover`}
@@ -101,41 +101,40 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                             <div className="lg:col-span-8">
                                 <SectionHeading label="Overview" />
                                 <Reveal delay={0.05}>
-                                    <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+                                    <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                                         {project.overview}
                                     </p>
                                 </Reveal>
 
-                                <SectionHeading label="What it does" className="mt-20" />
-                                <RevealGroup className="mt-8 flex flex-col gap-4">
-                                    {project.features.map((feature) => (
+                                <SectionHeading label="What it does" className="mt-18 sm:mt-20" />
+                                <RevealGroup className="mt-8 border-t border-hairline">
+                                    {project.features.map((feature, index) => (
                                         <RevealItem
                                             key={feature}
-                                            className="flex gap-4 border-b border-hairline pb-4"
+                                            className="grid grid-cols-[2rem_minmax(0,1fr)] gap-4 border-b border-hairline py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)]"
                                         >
-                                            <span
-                                                aria-hidden="true"
-                                                className="mt-2 size-1.5 shrink-0 rounded-full bg-accent"
-                                            />
+                                            <span aria-hidden="true" className="text-sm font-medium text-subtle tabular-nums">
+                                                {String(index + 1).padStart(2, '0')}
+                                            </span>
                                             <p className="leading-relaxed text-muted-foreground">{feature}</p>
                                         </RevealItem>
                                     ))}
                                 </RevealGroup>
 
-                                <SectionHeading label="Challenges" className="mt-20" />
-                                <div className="mt-8 flex flex-col gap-5">
+                                <SectionHeading label="Challenges" className="mt-18 sm:mt-20" />
+                                <div className="mt-8 grid gap-4">
                                     {project.challenges.map((challenge) => (
                                         <Reveal
                                             key={challenge.problem}
-                                            className="rounded-card border border-hairline bg-surface/40 p-6"
+                                            className="rounded-card border border-hairline bg-surface p-5 sm:p-6"
                                         >
-                                            <p className="font-mono text-[0.65rem] tracking-[0.2em] text-red-300/80 uppercase">
-                                                Problem
+                                            <p className="text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
+                                                Challenge
                                             </p>
-                                            <p className="mt-2 leading-relaxed">{challenge.problem}</p>
+                                            <p className="mt-2 leading-relaxed text-foreground">{challenge.problem}</p>
 
-                                            <p className="mt-5 font-mono text-[0.65rem] tracking-[0.2em] text-accent uppercase">
-                                                Solution
+                                            <p className="mt-6 text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
+                                                Approach
                                             </p>
                                             <p className="mt-2 leading-relaxed text-muted-foreground">
                                                 {challenge.solution}
@@ -144,15 +143,15 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                     ))}
                                 </div>
 
-                                <SectionHeading label="Outcomes" className="mt-20" />
-                                <RevealGroup className="mt-8 flex flex-col gap-3">
+                                <SectionHeading label="Outcomes" className="mt-18 sm:mt-20" />
+                                <RevealGroup className="mt-8 grid gap-3">
                                     {project.outcomes.map((outcome) => (
                                         <RevealItem
                                             key={outcome}
-                                            className="flex gap-4 text-muted-foreground"
+                                            className="flex gap-4 rounded-card border border-hairline bg-surface px-5 py-4 text-muted-foreground"
                                         >
-                                            <span aria-hidden="true" className="text-accent">
-                                                →
+                                            <span aria-hidden="true" className="font-medium text-foreground">
+                                                —
                                             </span>
                                             <p className="leading-relaxed">{outcome}</p>
                                         </RevealItem>
@@ -162,9 +161,9 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
 
                             <aside className="lg:col-span-4">
                                 <Reveal className="lg:sticky lg:top-28">
-                                    <div className="flex flex-col gap-4 rounded-card border border-hairline bg-surface/40 p-6">
+                                    <div className="flex flex-col gap-3 rounded-card border border-hairline bg-surface p-5 sm:p-6">
                                         {project.links.live && (
-                                            <Button asChild>
+                                            <Button asChild className="w-full justify-center">
                                                 <a
                                                     href={project.links.live}
                                                     target="_blank"
@@ -178,7 +177,7 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                         )}
 
                                         {project.links.repo && (
-                                            <Button asChild variant="outline">
+                                            <Button asChild variant="outline" className="w-full justify-center">
                                                 <a
                                                     href={project.links.repo}
                                                     target="_blank"
@@ -192,7 +191,7 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                         )}
 
                                         {project.links.video && (
-                                            <Button asChild variant="outline">
+                                            <Button asChild variant="outline" className="w-full justify-center">
                                                 <a
                                                     href={project.links.video}
                                                     target="_blank"
@@ -205,11 +204,7 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                                             </Button>
                                         )}
 
-                                        {!project.links.live && !project.links.repo && !project.links.video && (
-                                            <PrivateProjectNotice email={portfolio?.email} />
-                                        )}
-
-                                        {project.status === 'private' && (
+                                        {shouldShowPrivateProjectNotice && (
                                             <PrivateProjectNotice email={portfolio?.email} />
                                         )}
                                     </div>
@@ -219,38 +214,38 @@ export default function ProjectShow({ project, statuses, navigation, portfolio }
                     </Container>
                 </section>
 
-                <nav aria-label="Project navigation" className="border-t border-hairline py-16">
+                <nav aria-label="Project navigation" className="border-t border-hairline py-12 sm:py-16">
                     <Container>
-                        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="grid gap-4 sm:grid-cols-2">
                             {navigation.previous ? (
                                 <Link
                                     href={route('projects.show', { slug: navigation.previous.slug })}
                                     data-cursor="hover"
-                                    className="group flex flex-col gap-1"
+                                    className="group flex min-h-28 flex-col justify-between rounded-card border border-hairline p-5 transition-colors hover:border-hairline-strong hover:bg-surface-2"
                                 >
-                                    <span className="flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.2em] text-subtle uppercase">
+                                    <span className="flex items-center gap-2 text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
                                         <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" />
                                         Previous
                                     </span>
-                                    <span className="font-display text-lg transition-colors group-hover:text-accent">
+                                    <span className="font-display text-lg text-foreground">
                                         {navigation.previous.title}
                                     </span>
                                 </Link>
                             ) : (
-                                <span />
+                                <span className="hidden sm:block" />
                             )}
 
                             {navigation.next && (
                                 <Link
                                     href={route('projects.show', { slug: navigation.next.slug })}
                                     data-cursor="hover"
-                                    className="group flex flex-col gap-1 text-right"
+                                    className="group flex min-h-28 flex-col justify-between rounded-card border border-hairline p-5 text-right transition-colors hover:border-hairline-strong hover:bg-surface-2"
                                 >
-                                    <span className="flex items-center justify-end gap-2 font-mono text-[0.65rem] tracking-[0.2em] text-subtle uppercase">
+                                    <span className="flex items-center justify-end gap-2 text-[0.7rem] font-medium tracking-[0.14em] text-subtle uppercase">
                                         Next
                                         <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                                     </span>
-                                    <span className="font-display text-lg transition-colors group-hover:text-accent">
+                                    <span className="font-display text-lg text-foreground">
                                         {navigation.next.title}
                                     </span>
                                 </Link>

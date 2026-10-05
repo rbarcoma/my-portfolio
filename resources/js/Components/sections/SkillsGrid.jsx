@@ -1,102 +1,95 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
-import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { ArrowRight, Database, MonitorSmartphone, Palette, ServerCog, Sparkles, Wrench } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { RevealGroup, RevealItem } from '../common/Reveal';
 import { TechnologyIcon } from '../common/TechnologyIcon';
 
+const GROUP_ICONS = {
+    frontend: MonitorSmartphone,
+    backend: ServerCog,
+    database: Database,
+    tools: Wrench,
+    design: Palette,
+};
+
+const FULL_WIDTH_GROUPS = new Set(['frontend', 'tools']);
+
+const TILE_LAYOUTS = {
+    frontend: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    backend: 'grid-cols-1 sm:grid-cols-2',
+    database: 'grid-cols-1 sm:grid-cols-2',
+    tools: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6',
+    design: 'grid-cols-1 sm:grid-cols-2',
+};
+
 /**
- * A responsive discipline selector with an unboxed technology logo field.
+ * All disciplines are presented together so visitors can scan the full skill
+ * set without changing state. The compact tile treatment intentionally keeps
+ * technology marks secondary to the group hierarchy and readable labels.
  */
 export function SkillsGrid({ groups }) {
-    const reduced = useReducedMotion();
-    const [active, setActive] = useState(groups[0]?.id);
-
-    const activeGroup = useMemo(
-        () => groups.find((group) => group.id === active) ?? groups[0],
-        [active, groups],
-    );
-
-    if (!activeGroup) {
+    if (groups.length === 0) {
         return null;
     }
 
-    const selectGroup = (groupId) => setActive(groupId);
-
     return (
-        <div className="grid gap-10 lg:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.7fr)] lg:gap-14">
-            <ul aria-label="Skill disciplines" className="flex flex-col gap-1">
-                {groups.map((group) => {
-                    const selected = group.id === activeGroup.id;
+        <div role="list" aria-label="Skill disciplines" className="grid gap-4 md:grid-cols-2 sm:gap-5">
+            {groups.map((group) => {
+                const GroupIcon = GROUP_ICONS[group.id] ?? Sparkles;
+                const titleId = `skill-group-${group.id}-title`;
+                const descriptionId = `skill-group-${group.id}-description`;
 
-                    return (
-                        <li key={group.id}>
-                            <button
-                                type="button"
-                                aria-pressed={selected}
-                                onClick={() => selectGroup(group.id)}
-                                onFocus={() => selectGroup(group.id)}
-                                onPointerEnter={(event) => {
-                                    if (event.pointerType === 'mouse') {
-                                        selectGroup(group.id);
-                                    }
-                                }}
-                                data-cursor="hover"
-                                className={cn(
-                                    'group relative w-full py-1 pl-5 text-left font-display text-[clamp(1.9rem,5vw,4rem)] leading-[0.95] font-bold uppercase transition-colors duration-200',
-                                    selected
-                                        ? 'text-foreground'
-                                        : 'text-subtle hover:text-muted-foreground focus-visible:text-foreground',
-                                )}
-                            >
-                                <span
-                                    aria-hidden="true"
-                                    className={cn(
-                                        'absolute top-1/2 left-0 size-2 -translate-y-1/2 rounded-full transition-opacity duration-200',
-                                        selected ? 'bg-accent opacity-100' : 'bg-hairline opacity-0 group-hover:opacity-100',
-                                    )}
-                                />
-                                {group.label}
-                            </button>
-                        </li>
-                    );
-                })}
-            </ul>
-
-            <motion.div
-                key={activeGroup.id}
-                initial={reduced ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reduced ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
-                role="region"
-                aria-label={`${activeGroup.label} technologies`}
-                aria-live="polite"
-                className="border-t border-hairline pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-14"
-            >
-                <div className="flex gap-4">
-                    <ArrowUpRight className="mt-1 size-5 shrink-0 text-accent" aria-hidden="true" />
-                    <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                        {activeGroup.description}
-                    </p>
-                </div>
-
-                <RevealGroup
-                    key={activeGroup.id}
-                    role="list"
-                    className="mt-10 grid grid-cols-3 gap-x-5 gap-y-9 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7"
-                    stagger={0.05}
-                >
-                    {activeGroup.skills.map((skill) => (
-                        <RevealItem key={skill.name} role="listitem" y={16}>
-                            <div className="flex min-w-0 flex-col items-center gap-3 text-center">
-                                <TechnologyIcon skill={skill} className="size-11 sm:size-12" />
-                                <p className="text-sm leading-snug text-muted-foreground">{skill.name}</p>
+                return (
+                    <article
+                        key={group.id}
+                        role="listitem"
+                        aria-labelledby={titleId}
+                        aria-describedby={descriptionId}
+                        className={cn(
+                            'rounded-card border border-hairline bg-surface p-4 text-foreground sm:p-5',
+                            FULL_WIDTH_GROUPS.has(group.id) && 'md:col-span-2',
+                        )}
+                    >
+                        <header className="flex flex-col gap-3 border-b border-hairline pb-4 sm:flex-row sm:items-center">
+                            <div className="flex items-center gap-3">
+                                <GroupIcon className="size-5 shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                                <h3 id={titleId} className="text-sm font-semibold tracking-tight uppercase">
+                                    {group.label}
+                                </h3>
                             </div>
-                        </RevealItem>
-                    ))}
-                </RevealGroup>
-            </motion.div>
+
+                            <p
+                                id={descriptionId}
+                                className="text-sm leading-snug text-muted-foreground sm:ml-auto sm:text-right"
+                            >
+                                {group.description}
+                            </p>
+
+                            <ArrowRight
+                                className="hidden size-4 shrink-0 text-muted-foreground sm:block"
+                                strokeWidth={1.8}
+                                aria-hidden="true"
+                            />
+                        </header>
+
+                        <ul
+                            aria-label={`${group.label} technologies`}
+                            className={cn('mt-4 grid gap-2.5 sm:gap-3', TILE_LAYOUTS[group.id] ?? 'grid-cols-1 sm:grid-cols-2')}
+                        >
+                            {group.skills.map((skill) => (
+                                <li
+                                    key={skill.name}
+                                    className="flex min-h-15 min-w-0 items-center gap-3 rounded-xl border border-hairline bg-base/45 px-3.5 py-3 sm:px-4"
+                                >
+                                    <TechnologyIcon
+                                        skill={skill}
+                                        className="size-6 shrink-0 brightness-0"
+                                    />
+                                    <span className="min-w-0 text-sm font-medium text-foreground">{skill.name}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+                );
+            })}
         </div>
     );
 }

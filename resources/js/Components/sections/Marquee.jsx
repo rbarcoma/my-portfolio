@@ -1,32 +1,17 @@
-import { ScrollVelocity } from '../reactbits/ScrollVelocity';
 import { Container } from '../common/Container';
 
-const DEFAULT_ITEMS = [
-    'Laravel',
-    'React',
-    'Inertia.js',
-    'Tailwind CSS',
-    'PHP',
-    'MySQL',
-    'Python',
-    'REST APIs',
-];
-
-export function Marquee({ items = DEFAULT_ITEMS }) {
+export function Marquee({ items = [] }) {
     return (
-        <div className="border-y border-hairline bg-surface/40 py-5">
-            <Container>
-                <ScrollVelocity>
-                    {items.map((item) => (
-                        <span
-                            key={item}
-                            className="flex items-center gap-8 px-8 font-mono text-sm tracking-[0.25em] text-muted-foreground uppercase"
-                        >
+        <div className="border-y border-hairline bg-surface">
+            <Container className="overflow-x-auto py-4">
+                <ul className="flex min-w-max items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                    {items.map((item, index) => (
+                        <li key={item} className="flex items-center gap-6 whitespace-nowrap">
+                            {index > 0 && <span aria-hidden="true" className="size-1 rounded-full bg-subtle/60" />}
                             {item}
-                            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent/70" />
-                        </span>
+                        </li>
                     ))}
-                </ScrollVelocity>
+                </ul>
             </Container>
         </div>
     );

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useForm, usePage } from '@inertiajs/react';
 import { Check, Send } from 'lucide-react';
 import { useRoute } from '../../lib/route';
@@ -9,7 +9,6 @@ import { cn } from '../../lib/utils';
 export function ContactForm() {
     const route = useRoute();
     const { errors, flash } = usePage().props;
-    const formRef = useRef(null);
     const { data, setData, post, processing, reset, wasSuccessful } = useForm({
         name: '',
         email: '',
@@ -30,19 +29,19 @@ export function ContactForm() {
     };
 
     return (
-        <form ref={formRef} onSubmit={submit} noValidate className="flex flex-col gap-6">
+        <form onSubmit={submit} noValidate className="rounded-card border border-hairline bg-surface p-5 sm:p-7">
             {flash?.success && (
                 <div
                     role="status"
                     aria-live="polite"
-                    className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent"
+                    className="mb-6 flex items-center gap-3 rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-sm text-foreground"
                 >
                     <Check className="size-4" aria-hidden="true" />
                     {flash.success}
                 </div>
             )}
 
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                     <Label htmlFor="name">Name</Label>
                     <Input
@@ -77,7 +76,7 @@ export function ContactForm() {
                 </div>
             </div>
 
-            <div>
+            <div className="mt-5">
                 <Label htmlFor="subject">Subject</Label>
                 <Input
                     id="subject"
@@ -91,7 +90,7 @@ export function ContactForm() {
                 <FieldError id="subject-error">{errors.subject}</FieldError>
             </div>
 
-            <div>
+            <div className="mt-5">
                 <Label htmlFor="message">Message</Label>
                 <Textarea
                     id="message"
@@ -119,8 +118,8 @@ export function ContactForm() {
                 />
             </div>
 
-            <div>
-                <Button type="submit" size="lg" disabled={processing} data-cursor="hover">
+            <div className="mt-7">
+                <Button type="submit" size="lg" disabled={processing}>
                     <Send aria-hidden="true" />
                     {processing ? 'Sending…' : 'Send message'}
                 </Button>

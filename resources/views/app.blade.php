@@ -8,7 +8,7 @@
 
         <meta name="description" content="{{ config('portfolio.meta_description') }}" />
         <meta name="author" content="{{ config('portfolio.name') }}" />
-        <meta name="theme-color" content="#0A0A0F" />
+        <meta name="theme-color" content="#FAFAF8" />
 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 

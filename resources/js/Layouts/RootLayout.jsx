@@ -1,48 +1,29 @@
 import { usePage } from '@inertiajs/react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { TooltipProvider } from '../Components/ui/tooltip';
 import { Navbar } from '../Components/sections/Navbar';
 import { Footer } from '../Components/sections/Footer';
-import { CustomCursor } from '../Components/sections/CustomCursor';
-import { ScrollProgress } from '../Components/sections/ScrollProgress';
-
-const EASE = [0.16, 1, 0.3, 1];
 
 /**
- * Persistent application shell: navbar, footer, cursor, scroll progress.
+ * Persistent application shell: a quiet navigation frame and footer.
  * Inertia keeps this mounted across navigations, so only <main> swaps.
  */
 export function RootLayout({ children }) {
-    const { url, component, props } = usePage();
-    const reduced = useReducedMotion();
+    const { props } = usePage();
 
     return (
         <TooltipProvider>
-            <div className="relative flex min-h-dvh flex-col">
+            <div className="relative flex min-h-dvh flex-col bg-white text-zinc-950">
                 <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-full focus:bg-accent focus:px-5 focus:py-2 focus:text-sm focus:font-medium focus:text-base"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-zinc-950 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-2 focus:outline-offset-2 focus:outline-zinc-950"
                 >
                     Skip to content
                 </a>
 
-                <ScrollProgress />
                 <Navbar />
-                <CustomCursor />
 
                 <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
-                    <AnimatePresence mode="wait" initial={false}>
-                        <motion.div
-                            key={component ?? url}
-                            initial={reduced ? false : { opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={reduced ? undefined : { opacity: 0, y: -8 }}
-                            transition={{ duration: reduced ? 0 : 0.25, ease: EASE }}
-                        >
-                            {children}
-                        </motion.div>
-                    </AnimatePresence>
+                    {children}
                 </main>
 
                 <Footer socials={props.socials ?? []} portfolio={props.portfolio ?? {}} />

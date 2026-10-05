@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import { contributionIntensity, recentWeeks } from '../../lib/contributions';
 import { Container } from '../common/Container';
 import { SectionHeading } from '../common/SectionHeading';
@@ -7,8 +7,6 @@ import { Reveal } from '../common/Reveal';
 import { Tooltip } from '../ui/tooltip';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-/** The upstream sends every year on record; a profile only ever shows one. */
 const VISIBLE_WEEKS = 53;
 
 function Heatmap({ weeks }) {
@@ -21,24 +19,24 @@ function Heatmap({ weeks }) {
     );
 
     if (grid.length === 0) {
-        return null;
+        return <p className="text-sm text-muted-foreground">Contribution data is not available right now.</p>;
     }
 
     return (
         <div className="overflow-x-auto pb-2">
-            <div className="mx-auto w-max">
+            <div className="w-max">
                 <div className="flex gap-[3px]">
                     {grid.map((counts, weekIndex) => (
                         <div key={weekIndex} className="flex flex-col gap-[3px]">
                             {counts.map((count, dayIndex) => (
                                 <Tooltip
-                                    key={`${weekIndex}-${dayIndex}`}
-                                    content={`${count} contribution${count === 1 ? '' : 's'}`}
+                                    key={weekIndex + '-' + dayIndex}
+                                    content={count + ' contribution' + (count === 1 ? '' : 's')}
                                 >
                                     <span
-                                        className={`size-3 rounded-[2px] ${contributionIntensity(count)}`}
+                                        className={'size-3 rounded-[2px] ' + contributionIntensity(count)}
                                         role="img"
-                                        aria-label={`${DAY_LABELS[dayIndex]}: ${count} contributions`}
+                                        aria-label={DAY_LABELS[dayIndex] + ': ' + count + ' contributions'}
                                     />
                                 </Tooltip>
                             ))}
@@ -50,15 +48,15 @@ function Heatmap({ weeks }) {
     );
 }
 
-function ContributionLegend() {
+function Legend() {
     return (
-        <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
             <span>Less</span>
             {[0, 1, 3, 6, 10].map((count) => (
                 <span
                     key={count}
                     aria-hidden="true"
-                    className={`size-3 rounded-[2px] ${contributionIntensity(count)}`}
+                    className={'size-3 rounded-[2px] ' + contributionIntensity(count)}
                 />
             ))}
             <span>More</span>
@@ -66,18 +64,39 @@ function ContributionLegend() {
     );
 }
 
+function Metric({ value, label }) {
+    return (
+        <div>
+            <p className="font-display text-2xl font-semibold tabular-nums sm:text-3xl">{value ?? '—'}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{label}</p>
+        </div>
+    );
+}
+
 function GithubContent({ github, compact, embedded }) {
-    const { profile, languages, contributions } = github;
+    const { profile, languages = [], contributions } = github;
+    const profileUrl = profile?.url ?? 'https://github.com/' + github.username;
 
     return (
         <>
             {embedded ? (
                 <Reveal>
-                    <div className="text-center">
-                        <p className="font-mono text-xs tracking-[0.3em] text-accent uppercase">
-                            GitHub activity
-                        </p>
-                        <h3 className="mt-3 text-2xl sm:text-3xl">Contributions in the open.</h3>
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <p className="eyebrow">GitHub activity</p>
+                            <h2 className="mt-4 text-[clamp(2.4rem,5vw,4.25rem)] leading-[0.98] font-semibold">
+                                Contributions in the open.
+                            </h2>
+                        </div>
+                        <a
+                            href={profileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 self-start rounded-full bg-foreground px-5 py-3 text-sm font-medium text-base transition-colors hover:bg-foreground/80 sm:self-auto"
+                        >
+                            View GitHub
+                            <ArrowUpRight className="size-4" aria-hidden="true" />
+                        </a>
                     </div>
                 </Reveal>
             ) : (
@@ -87,81 +106,57 @@ function GithubContent({ github, compact, embedded }) {
                 />
             )}
 
-            {contributions?.weeks?.length > 0 && (
-                <Reveal className={embedded ? 'mt-8' : 'mt-6'}>
-                    <div className="mx-auto max-w-5xl rounded-card border border-hairline bg-surface/40 p-5 sm:p-8">
-                        <div className="mb-6 flex flex-col items-center gap-2 text-center">
-                            <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-                                {contributions.this_year} contributions this year
-                            </p>
-                            <a
-                                href={profile?.url ?? `https://github.com/${github.username}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-cursor="hover"
-                                className="inline-flex items-center gap-2 text-sm text-accent underline-offset-4 hover:underline"
-                            >
-                                @{profile?.login ?? github.username}
-                                <ExternalLink className="size-3.5" aria-hidden="true" />
-                            </a>
-                        </div>
-
-                        <Heatmap weeks={contributions.weeks} />
-                        <ContributionLegend />
-                    </div>
-                </Reveal>
-            )}
-
-            {languages.length > 0 && (
-                <Reveal className="mt-6">
-                    <div className="mx-auto max-w-5xl rounded-card border border-hairline bg-surface/40 p-5 sm:p-8">
-                        <p className="text-center font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-                            Top languages
-                        </p>
-
-                        <div className="mt-5 flex h-2 w-full overflow-hidden rounded-full">
-                            {languages.map((language) => (
-                                <span
-                                    key={language.name}
-                                    className="h-full"
-                                    style={{
-                                        width: `${language.percentage}%`,
-                                        backgroundColor: language.color,
-                                    }}
-                                    title={`${language.name} ${language.percentage}%`}
-                                />
-                            ))}
-                        </div>
-
-                        <ul className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2">
-                            {languages.map((language) => (
-                                <li
-                                    key={language.name}
-                                    className="flex items-center gap-2 text-sm text-muted-foreground"
+            <Reveal className={embedded ? 'mt-9' : 'mt-7'}>
+                <div className="overflow-hidden rounded-card border border-hairline bg-surface">
+                    <div className="grid lg:grid-cols-12">
+                        <div className="p-5 sm:p-7 lg:col-span-8">
+                            <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-sm font-medium">Contribution graph</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {contributions?.this_year ?? 0} contributions this year
+                                    </p>
+                                </div>
+                                <a
+                                    href={profileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                                 >
-                                    <span
-                                        aria-hidden="true"
-                                        className="size-2.5 rounded-full"
-                                        style={{ backgroundColor: language.color }}
-                                    />
-                                    {language.name}
-                                    <span className="font-mono text-xs text-subtle">
-                                        {language.percentage}%
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
+                                    @{profile?.login ?? github.username}
+                                    <ExternalLink className="size-3.5" aria-hidden="true" />
+                                </a>
+                            </div>
+                            {contributions?.weeks?.length > 0 ? <Heatmap weeks={contributions.weeks} /> : <Heatmap weeks={[]} />}
+                            {contributions?.weeks?.length > 0 && <Legend />}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-5 border-t border-hairline p-5 sm:p-7 lg:col-span-4 lg:grid-cols-1 lg:border-t-0 lg:border-l">
+                            <Metric value={contributions?.this_year ?? contributions?.total} label="Contributions" />
+                            <Metric value={profile?.public_repos} label="Repositories" />
+                            <Metric value={languages.length} label="Languages" />
+                        </div>
                     </div>
-                </Reveal>
-            )}
+
+                    {languages.length > 0 && (
+                        <div className="border-t border-hairline px-5 py-4 sm:px-7">
+                            <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                                {languages.slice(0, 5).map((language) => (
+                                    <li key={language.name} className="flex items-center gap-2 text-xs text-muted-foreground">
+                                        <span aria-hidden="true" className="size-1.5 rounded-full bg-foreground" />
+                                        {language.name}
+                                        <span className="text-subtle">{language.percentage}%</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            </Reveal>
         </>
     );
 }
 
-/**
- * GitHub activity: contribution heatmap and language breakdown.
- * Renders a calm fallback when the API is unavailable.
- */
 export function GithubPanel({ github, compact = false, embedded = false }) {
     if (!github?.available) {
         return null;
@@ -170,11 +165,11 @@ export function GithubPanel({ github, compact = false, embedded = false }) {
     const content = <GithubContent github={github} compact={compact} embedded={embedded} />;
 
     if (embedded) {
-        return <div className="mt-16 border-t border-hairline pt-12">{content}</div>;
+        return <section className="mt-18 border-t border-hairline pt-16 sm:mt-24 sm:pt-20">{content}</section>;
     }
 
     return (
-        <section className={compact ? 'border-t border-hairline bg-surface/20 py-20' : 'section-pad'}>
+        <section className={compact ? 'border-t border-hairline bg-surface py-20' : 'section-pad'}>
             <Container>{content}</Container>
         </section>
     );

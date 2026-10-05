@@ -8,12 +8,12 @@ export function FeaturedProjects({ projects, statuses, id = 'projects' }) {
         <section id={id} className="scroll-mt-24 section-pad-compact">
             <Container>
                 <SectionHeading
-                    label="Selected Work"
-                    title="Three projects, end to end."
-                    lead="Data tooling, a booking engine, and an interactive simulator — each shipped from database design to interface."
+                    label="What I build"
+                    title="Work with a clear purpose."
+                    lead="Data tooling, booking flows, and interactive learning tools — designed from the first schema through the final interface."
                 />
 
-                <RevealGroup className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <RevealGroup className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {projects.map((project) => (
                         <RevealItem key={project.slug} className="h-full">
                             <ProjectCard project={project} statuses={statuses} />

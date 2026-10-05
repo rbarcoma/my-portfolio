@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
-import { Menu, Moon, Sun } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useScrollDirection } from '../../hooks/useScrollDirection';
-import { useIsDesktop } from '../../hooks/useMediaQuery';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Menu, X } from 'lucide-react';
 import { useRoute } from '../../lib/route';
 import { cn } from '../../lib/utils';
 import { CvButton } from '../common/CvButton';
-import { Sheet, SheetClose, SheetTitle } from '../ui/sheet';
 
 const LINKS = [
     { id: 'home', label: 'Home' },
@@ -18,49 +15,14 @@ const LINKS = [
     { id: 'contact', label: 'Contact' },
 ];
 
-function applyTheme(isDark) {
-    document.documentElement.classList.toggle('dark', isDark);
-    document.documentElement.classList.toggle('light', !isDark);
-    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-}
-
-function ThemeToggle({ isDark, onToggle }) {
-    const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
-
-    return (
-        <button
-            type="button"
-            onClick={onToggle}
-            aria-label={label}
-            aria-pressed={isDark}
-            title={label}
-            className="inline-flex size-9 items-center justify-center rounded-full border border-hairline text-foreground transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-            {isDark ? <Sun className="size-4" aria-hidden="true" /> : <Moon className="size-4" aria-hidden="true" />}
-        </button>
-    );
-}
-
 export function Navbar() {
     const route = useRoute();
     const { url, props } = usePage();
     const pathname = url.split(/[?#]/)[0];
-    const { offset } = useScrollDirection();
-    const isDesktop = useIsDesktop();
     const [open, setOpen] = useState(false);
-    const [isDark, setIsDark] = useState(true);
     const [activeSection, setActiveSection] = useState('home');
 
     const sectionHref = (id) => route('home') + '#' + id;
-    const condensed = offset > 40;
-
-    useEffect(() => {
-        const storedTheme = window.localStorage.getItem('portfolio-theme');
-        const nextTheme = storedTheme !== 'light';
-
-        applyTheme(nextTheme);
-        setIsDark(nextTheme);
-    }, []);
 
     useEffect(() => {
         const close = () => setOpen(false);
@@ -69,14 +31,6 @@ export function Navbar() {
 
         return () => window.removeEventListener('resize', close);
     }, []);
-
-    useEffect(() => {
-        document.body.style.overflow = open ? 'hidden' : '';
-
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [open]);
 
     useEffect(() => {
         if (pathname !== '/') {
@@ -126,131 +80,118 @@ export function Navbar() {
         };
     }, [pathname]);
 
-    const toggleTheme = () => {
-        setIsDark((currentTheme) => {
-            const nextTheme = !currentTheme;
-
-            applyTheme(nextTheme);
-            window.localStorage.setItem('portfolio-theme', nextTheme ? 'dark' : 'light');
-
-            return nextTheme;
-        });
-    };
-
     return (
-        <header className="fixed inset-x-0 top-0 z-40">
-            <div
-                className={cn(
-                    'transition-all duration-300 ease-[var(--ease-out-expo)]',
-                    condensed && 'border-b border-hairline bg-base/80 backdrop-blur-xl',
-                )}
-            >
-                <nav aria-label="Primary" className="container-page flex h-16 items-center gap-6 sm:h-18">
+        <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+            <header className="fixed inset-x-0 top-0 z-40 border-b border-zinc-200/80 bg-white/85 backdrop-blur-md">
+                <nav aria-label="Primary" className="container-page flex h-16 items-center gap-6">
                     <a
                         href={sectionHref('home')}
                         aria-label="Renante Barcoma home"
-                        className="font-display text-sm tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                        className="font-display text-base font-bold tracking-tight text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
                     >
-                        <span className="text-lg font-bold">RB</span>
+                        RB
                     </a>
 
-                    <div className="ml-auto flex shrink-0 items-center gap-2">
-                        {isDesktop && (
-                            <ul className="flex items-center gap-1">
-                                {LINKS.map((link) => {
-                                    const current = pathname === '/' && activeSection === link.id;
+                    <div className="ml-auto flex items-center gap-3">
+                        <ul className="hidden items-center gap-1 lg:flex">
+                            {LINKS.map((link) => {
+                                const current = pathname === '/' && activeSection === link.id;
 
-                                    return (
-                                        <li key={link.id}>
-                                            <a
-                                                href={sectionHref(link.id)}
-                                                aria-current={current ? 'location' : undefined}
-                                                data-cursor="hover"
-                                                className={cn(
-                                                    'relative block rounded-full px-4 py-2 text-sm transition-colors duration-200',
-                                                    current
-                                                        ? 'text-foreground'
-                                                        : 'text-muted-foreground hover:text-foreground',
-                                                )}
-                                            >
-                                                {current && (
-                                                    <motion.span
-                                                        layoutId="nav-active"
-                                                        className="absolute inset-0 -z-10 rounded-full border border-hairline bg-surface"
-                                                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                                                    />
-                                                )}
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        )}
+                                return (
+                                    <li key={link.id}>
+                                        <a
+                                            href={sectionHref(link.id)}
+                                            aria-current={current ? 'location' : undefined}
+                                            className={cn(
+                                                'relative block px-2.5 py-2 text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950',
+                                                current ? 'font-medium text-zinc-950' : 'text-zinc-500 hover:text-zinc-950',
+                                            )}
+                                        >
+                                            {link.label}
+                                            {current && (
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="absolute right-2.5 bottom-0 left-2.5 border-b border-zinc-950"
+                                                />
+                                            )}
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
 
-                        <div className="flex shrink-0 items-center gap-2">
-                            <div className="hidden sm:block">
-                                <CvButton cv={props.cv} size="sm" label="Download CV" />
-                            </div>
-
-                            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-
-                            {!isDesktop && (
-                                <button
-                                    type="button"
-                                    onClick={() => setOpen(true)}
-                                    aria-label="Open menu"
-                                    aria-expanded={open}
-                                    className="inline-flex size-10 items-center justify-center rounded-full border border-hairline text-foreground transition-colors hover:bg-surface-2"
-                                >
-                                    <Menu className="size-5" aria-hidden="true" />
-                                </button>
-                            )}
+                        <div className="hidden sm:block">
+                            <CvButton
+                                cv={props.cv}
+                                size="sm"
+                                label="Download CV"
+                                className="bg-zinc-950 text-white shadow-none hover:bg-zinc-800 hover:shadow-none"
+                            />
                         </div>
+
+                        <DialogPrimitive.Trigger asChild>
+                            <button
+                                type="button"
+                                aria-label="Open menu"
+                                className="inline-flex size-9 items-center justify-center rounded-md border border-zinc-300 text-zinc-700 transition-colors duration-200 hover:border-zinc-950 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950 lg:hidden"
+                            >
+                                <Menu className="size-4" aria-hidden="true" />
+                            </button>
+                        </DialogPrimitive.Trigger>
                     </div>
                 </nav>
-            </div>
+            </header>
 
-            <AnimatePresence>
-                {open && (
-                    <Sheet open={open} onOpenChange={setOpen} side="right" label="Site navigation">
-                        <div className="flex h-full flex-col justify-between p-8">
-                            <SheetTitle className="sr-only">Site navigation</SheetTitle>
+            <DialogPrimitive.Portal>
+                <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-zinc-950/10 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+                <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-zinc-200 bg-white p-6 shadow-xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right sm:p-8">
+                    <DialogPrimitive.Title className="font-display text-lg font-semibold text-zinc-950">
+                        Navigation
+                    </DialogPrimitive.Title>
+                    <DialogPrimitive.Description className="sr-only">
+                        Choose a section of the site or download the CV.
+                    </DialogPrimitive.Description>
+                    <DialogPrimitive.Close
+                        className="absolute top-5 right-5 inline-flex size-9 items-center justify-center rounded-md text-zinc-500 transition-colors duration-200 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950"
+                        aria-label="Close menu"
+                    >
+                        <X className="size-4" aria-hidden="true" />
+                    </DialogPrimitive.Close>
 
-                            <ul className="mt-20 flex flex-col gap-1">
-                                {LINKS.map((link, index) => (
-                                    <motion.li
-                                        key={link.id}
-                                        initial={{ opacity: 0, x: 24 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.06 * index, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                    >
-                                        <SheetClose asChild>
-                                            <a
-                                                href={sectionHref(link.id)}
-                                                className="block border-b border-hairline py-4 font-display text-2xl transition-colors hover:text-accent"
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </SheetClose>
-                                    </motion.li>
-                                ))}
-                            </ul>
+                    <ul className="mt-12 flex flex-col border-t border-zinc-200">
+                        {LINKS.map((link) => {
+                            const current = pathname === '/' && activeSection === link.id;
 
-                            <div className="flex items-center gap-3">
-                                <CvButton
-                                    cv={props.cv}
-                                    size="md"
-                                    label="Download CV"
-                                    className="flex-1 justify-center"
-                                />
-                                <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-                            </div>
-                        </div>
-                    </Sheet>
-                )}
-            </AnimatePresence>
-        </header>
+                            return (
+                                <li key={link.id} className="border-b border-zinc-200">
+                                    <DialogPrimitive.Close asChild>
+                                        <a
+                                            href={sectionHref(link.id)}
+                                            aria-current={current ? 'location' : undefined}
+                                            className={cn(
+                                                'block py-4 font-display text-xl tracking-tight transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950',
+                                                current ? 'font-semibold text-zinc-950' : 'text-zinc-600 hover:text-zinc-950',
+                                            )}
+                                        >
+                                            {link.label}
+                                        </a>
+                                    </DialogPrimitive.Close>
+                                </li>
+                            );
+                        })}
+                    </ul>
+
+                    <div className="mt-auto border-t border-zinc-200 pt-6">
+                        <CvButton
+                            cv={props.cv}
+                            size="md"
+                            label="Download CV"
+                            className="w-full justify-center bg-zinc-950 text-white shadow-none hover:bg-zinc-800 hover:shadow-none"
+                        />
+                    </div>
+                </DialogPrimitive.Content>
+            </DialogPrimitive.Portal>
+        </DialogPrimitive.Root>
     );
 }
 

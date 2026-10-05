@@ -1,7 +1,6 @@
 import { ArrowDownToLine, Lock } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
-import { ClickSpark } from '../reactbits/ClickSpark';
 
 /**
  * CV download CTA. Download attribute keeps the browser on the page;
@@ -13,14 +12,12 @@ export function CvButton({ cv, className, size = 'md', label }) {
     }
 
     return (
-        <ClickSpark>
-            <Button asChild size={size} className={cn('text-black', className)}>
-                <a href={`/cv`} download={cv.filename} data-cursor="hover">
-                    <ArrowDownToLine aria-hidden="true" />
-                    <span>{label ?? cv.label ?? 'Download CV'}</span>
-                </a>
-            </Button>
-        </ClickSpark>
+        <Button asChild size={size} className={className}>
+            <a href="/cv" download={cv.filename}>
+                <ArrowDownToLine aria-hidden="true" />
+                <span>{label ?? cv.label ?? 'Download CV'}</span>
+            </a>
+        </Button>
     );
 }
 
@@ -29,11 +26,11 @@ export function CvButton({ cv, className, size = 'md', label }) {
  */
 export function PrivateProjectNotice({ email }) {
     return (
-        <div className="flex items-start gap-3 rounded-card border border-hairline bg-surface/50 p-5 text-sm text-muted-foreground">
-            <Lock className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />
+        <div className="flex items-start gap-3 rounded-xl border border-hairline bg-surface-2/60 p-4 text-sm text-muted-foreground">
+            <Lock className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden="true" />
             <p>
                 Private client project — a walkthrough is available on request.{' '}
-                <a href={`mailto:${email}`} className="text-accent underline-offset-4 hover:underline">
+                <a href={'mailto:' + email} className="font-medium text-foreground underline underline-offset-4">
                     Ask for access
                 </a>
                 .

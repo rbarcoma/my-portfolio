@@ -1,102 +1,66 @@
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { ArrowDownRight, ArrowRight } from 'lucide-react';
 import { useRoute } from '../../lib/route';
 import { Button } from '../ui/button';
-import { RotatingText } from '../reactbits/RotatingText';
-import { ScrambleText } from '../reactbits/ScrambleText';
-import { SplitText } from '../reactbits/SplitText';
-import { CursorGrid } from '../reactbits/CursorGrid';
-import { Magnet } from '../reactbits/Magnet';
 import { Container } from '../common/Container';
-
-const HEADLINE_WORDS = ['FULL-STACK', 'DEVELOPER'];
+import { Reveal, RevealGroup, RevealItem } from '../common/Reveal';
 
 export function Hero({ hero }) {
     const route = useRoute();
-    const reduced = useReducedMotion();
 
     return (
-        <section id="home" className="relative flex min-h-[100svh] scroll-mt-24 items-center overflow-hidden pt-24 pb-16">
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -left-20 size-[38rem] rounded-full bg-accent/12 blur-[130px]" />
-                <div className="absolute top-1/3 -right-32 size-[34rem] rounded-full bg-secondary/10 blur-[140px]" />
-                <CursorGrid
-                    className="absolute inset-0"
-                    cellSize={72}
-                    color="var(--color-accent)"
-                    radius={145}
-                    holdTime={280}
-                    fadeDuration={760}
-                    lineWidth={1}
-                    maxOpacity={0.62}
-                    fillOpacity={0.035}
-                    gridOpacity={0.06}
-                    clickPulse={false}
-                    pulseSpeed={520}
-                />
-            </div>
+        <section id="home" className="scroll-mt-24 pt-32 pb-18 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32">
+            <Container>
+                <div className="grid items-end gap-12 lg:grid-cols-12 lg:gap-10">
+                    <div className="lg:col-span-8">
+                        <Reveal>
+                            <p className="eyebrow">{hero.eyebrow}</p>
+                        </Reveal>
 
-            <Container className="relative z-10">
-                <div className="mx-auto max-w-5xl text-center">
-                    <motion.p
-                        initial={reduced ? false : { opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        className="font-mono text-xs tracking-[0.35em] text-accent uppercase sm:text-sm"
-                    >
-                        <ScrambleText text={hero.eyebrow} />
-                    </motion.p>
+                        <Reveal delay={0.04}>
+                            <h1 className="mt-7 max-w-4xl text-[clamp(3.25rem,8.5vw,7.25rem)] leading-[0.9] font-bold text-balance">
+                                {hero.headline}
+                            </h1>
+                        </Reveal>
 
-                    <h1 className="mt-6 font-display text-[clamp(2.75rem,11vw,8.5rem)] leading-[0.9] font-bold tracking-tight uppercase">
-                        {HEADLINE_WORDS.map((word, index) => (
-                            <span key={word} className="block overflow-hidden">
-                                <SplitText
-                                    text={word}
-                                    delay={0.1 + index * 0.15}
-                                    className={
-                                        index === HEADLINE_WORDS.length - 1
-                                            ? 'text-black dark:text-foreground'
-                                            : undefined
-                                    }
-                                />
-                            </span>
-                        ))}
-                    </h1>
+                        <Reveal delay={0.08}>
+                            <p className="mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                                {hero.subline}
+                            </p>
+                        </Reveal>
 
-                    <motion.p
-                        initial={reduced ? false : { opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                        className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
-                    >
-                        I build{' '}
-                        <RotatingText
-                            items={hero.rotating}
-                            className="font-display font-medium text-accent"
-                        />{' '}
-                        — end to end, with the schema and the pixels treated as
-                        equally important.
-                    </motion.p>
+                        <Reveal delay={0.12}>
+                            <div className="mt-9 flex flex-wrap gap-3">
+                                <Button asChild size="lg">
+                                    <a href={route('home') + '#projects'}>
+                                        View selected work
+                                        <ArrowRight aria-hidden="true" />
+                                    </a>
+                                </Button>
+                                <Button asChild variant="outline" size="lg">
+                                    <a href={route('home') + '#contact'}>Start a conversation</a>
+                                </Button>
+                            </div>
+                        </Reveal>
+                    </div>
 
-                    <motion.div
-                        initial={reduced ? false : { opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                        className="mt-10 flex flex-wrap items-center justify-center gap-4"
-                    >
-                        <Magnet>
-                            <Button asChild variant="outline" size="lg">
-                                <a href={route('home') + '#projects'} data-cursor="hover">
-                                    View projects
-                                    <ArrowRight aria-hidden="true" />
-                                </a>
-                            </Button>
-                        </Magnet>
-                    </motion.div>
+                    <Reveal delay={0.16} className="lg:col-span-4">
+                        <aside className="rounded-card border border-hairline bg-surface p-5 sm:p-6">
+                            <div className="flex items-center justify-between gap-4 border-b border-hairline pb-4">
+                                <p className="text-sm font-medium">What I work with</p>
+                                <ArrowDownRight className="size-4 text-muted-foreground" aria-hidden="true" />
+                            </div>
+                            <RevealGroup className="mt-5 grid gap-3" stagger={0.05}>
+                                {hero.rotating?.map((item, index) => (
+                                    <RevealItem key={item} className="flex items-center gap-3">
+                                        <span className="w-5 text-xs tabular-nums text-subtle">0{index + 1}</span>
+                                        <span className="text-sm text-muted-foreground">{item}</span>
+                                    </RevealItem>
+                                ))}
+                            </RevealGroup>
+                        </aside>
+                    </Reveal>
                 </div>
             </Container>
-
         </section>
     );
 }

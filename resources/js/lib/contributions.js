@@ -1,5 +1,5 @@
 /**
- * Map a contribution count to one of five lime intensity steps.
+ * Map a contribution count to one of five neutral intensity steps.
  */
 export function contributionIntensity(count) {
     if (count === 0) {

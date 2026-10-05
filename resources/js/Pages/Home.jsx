@@ -32,38 +32,40 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
 
             <StatsBand stats={stats} github={liveGithub} />
 
-            <section id="skills" className="scroll-mt-24 section-pad-compact">
+            <section id="skills" className="scroll-mt-24 section-pad">
                 <Container>
                     <SectionHeading
-                        label="Capabilities"
+                        label="Skills"
                         title="Skills"
-                        lead="Hover or select a discipline to explore the technologies behind the work."
+                        lead="A curated set of tools, frameworks, and technologies I use to turn ideas into useful products."
                     />
 
-                    <div className="mt-12">
+                    <div className="mt-10">
                         <SkillsGrid groups={groups} />
                     </div>
-
-                    {liveGithub?.available && <GithubPanel github={liveGithub} embedded />}
                 </Container>
             </section>
 
             <FeaturedProjects projects={projects} statuses={statuses} id="projects" />
 
+            {liveGithub?.available && (
+                <Container>
+                    <GithubPanel github={liveGithub} embedded />
+                </Container>
+            )}
+
             <Timeline items={timeline} id="experience" />
 
-            <section id="contact" className="scroll-mt-24 section-pad-compact">
+            <section id="contact" className="scroll-mt-24 section-pad">
                 <Container>
                     <SectionHeading label="Contact" title={contact.headline} lead={contact.lead} />
 
-                    <div className="mt-14 grid gap-16 lg:grid-cols-12">
+                    <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-16">
                         <div className="lg:col-span-5">
                             <Reveal>
-                                <p className="font-mono text-xs tracking-[0.25em] text-accent uppercase">
-                                    Direct channels
-                                </p>
+                                <p className="text-sm font-medium">Direct channels</p>
 
-                                <ul className="mt-6 flex gap-3">
+                                <ul className="mt-5 flex gap-3">
                                     {socials.map((social) => (
                                         <li key={social.url}>
                                             <MagneticIcon social={social} />
@@ -72,16 +74,15 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
                                 </ul>
 
                                 <p className="mt-8 max-w-sm leading-relaxed text-muted-foreground">
-                                    Prefer email? The form lands straight in my inbox, and I answer everything
-                                    within a day or two.
+                                    Prefer email? The form lands straight in my inbox, and I reply within a day or two.
                                 </p>
 
-                                <p className="mt-10 font-mono text-xs tracking-[0.2em] text-subtle uppercase">
-                                    Availability
-                                </p>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    Open to full-time roles, freelance work, and internships.
-                                </p>
+                                <div className="mt-9 border-t border-hairline pt-5">
+                                    <p className="text-xs font-medium tracking-[0.12em] text-subtle uppercase">Availability</p>
+                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                                        Open to full-time roles, freelance work, and internships.
+                                    </p>
+                                </div>
                             </Reveal>
                         </div>
 
