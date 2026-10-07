@@ -1,4 +1,4 @@
-import { Braces, Database, Network, Palette } from 'lucide-react';
+import { Database, Network, Palette } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 function CanvaIcon({ className }) {
@@ -20,29 +20,21 @@ const GENERIC_ICONS = {
     palette: Palette,
 };
 
-const THEME_AWARE_ICONS = new Set(['github', 'shadcnui']);
-
 /**
- * A technology mark with a local Lucide fallback for unbranded concepts or
- * an unavailable brand asset. The visible card label provides its accessible name.
+ * A technology mark for a skill. The visible card label provides its accessible name.
  */
 export function TechnologyIcon({ skill, className }) {
-    const GenericIcon = GENERIC_ICONS[skill.icon] ?? Braces;
-    const isGeneric = skill.icon in GENERIC_ICONS;
-    const themeAware = THEME_AWARE_ICONS.has(skill.icon);
+    const GenericIcon = GENERIC_ICONS[skill.icon];
+    const isGeneric = Boolean(GenericIcon);
 
     return (
         <span
             aria-hidden="true"
             className={cn('relative inline-flex shrink-0 items-center justify-center', className)}
         >
-            <GenericIcon
-                className={cn('size-full', themeAware && 'text-foreground')}
-                strokeWidth={1.65}
-                style={themeAware ? undefined : { color: `#${skill.color}` }}
-            />
-
-            {!isGeneric && (
+            {isGeneric ? (
+                <GenericIcon className="size-full" strokeWidth={1.65} style={{ color: `#${skill.color}` }} />
+            ) : (
                 <img
                     src={`https://cdn.simpleicons.org/${skill.icon}/${skill.color}`}
                     alt=""

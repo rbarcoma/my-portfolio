@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -12,9 +14,28 @@ class GitHubService
 
     private const REPOS_TTL = 21600;
 
+    private const LANGUAGES_TTL = 900;
+
     private const CONTRIBUTIONS_TTL = 30;
 
     private const CONTRIBUTION_RANGE_DAYS = 365;
+
+    private const LANGUAGE_REQUEST_CONCURRENCY = 8;
+
+    /**
+     * @var array<string, string>
+     */
+    private const LANGUAGE_COLORS = [
+        'Blade' => '#F7523F',
+        'CSS' => '#663399',
+        'HTML' => '#E34F26',
+        'Java' => '#F89820',
+        'JavaScript' => '#F7DF1E',
+        'PHP' => '#777BB4',
+        'Python' => '#3776AB',
+        'TypeScript' => '#3178C6',
+        'Vue' => '#41B883',
+    ];
 
     /**
      * @return array{
@@ -111,45 +132,41 @@ class GitHubService
      */
     public function languages(string $username): array
     {
-        return Cache::remember("github.languages.v2.{$username}", self::PROFILE_TTL, function () use ($username): array {
-            $repos = $this->getJson("https://api.github.com/users/{$username}/repos", ['per_page' => 100]);
+        return Cache::remember($this->languageCacheKey($username), self::LANGUAGES_TTL, function () use ($username): array {
+            $repos = $this->getJson("https://api.github.com/users/{$username}/repos", [
+                'per_page' => 100,
+                'sort' => 'updated',
+                'type' => 'owner',
+            ]);
 
             if ($repos === null) {
                 return [];
             }
 
-            $colors = [
-                'PHP' => '#7A7FE5',
-                'JavaScript' => '#C6FF3E',
-                'TypeScript' => '#22D3EE',
-                'Python' => '#F5C542',
-                'HTML' => '#E34F26',
-                'CSS' => '#A78BFA',
-                'Blade' => '#F7523F',
-                'Vue' => '#41B883',
-                'Java' => '#F89820',
-            ];
+            $languageUrls = collect($repos)
+                ->filter(fn (mixed $repo): bool => is_array($repo))
+                ->reject(fn (array $repo): bool => (bool) ($repo['fork'] ?? false))
+                ->pluck('languages_url')
+                ->filter(fn (mixed $url): bool => is_string($url) && $url !== '')
+                ->values()
+                ->all();
 
-            $bytes = collect($repos)
-                ->pluck('language')
-                ->filter()
-                ->countBy()
+            $bytes = $this->languageBytes($languageUrls);
+            $total = array_sum($bytes);
+
+            if ($total === 0) {
+                return [];
+            }
+
+            arsort($bytes);
+
+            return collect($bytes)
                 ->map(fn (int $count, string $language): array => [
                     'name' => $language,
-                    'color' => $colors[$language] ?? '#6F6F7D',
-                    'count' => $count,
+                    'color' => self::LANGUAGE_COLORS[$language] ?? '#6F6F7D',
+                    'percentage' => round(($count / $total) * 100, 1),
                 ])
-                ->sortByDesc('count')
-                ->values();
-
-            $total = max($bytes->sum('count'), 1);
-
-            return $bytes
-                ->map(fn (array $language): array => [
-                    'name' => $language['name'],
-                    'color' => $language['color'],
-                    'percentage' => round(($language['count'] / $total) * 100, 1),
-                ])
+                ->values()
                 ->all();
         });
     }
@@ -216,6 +233,16 @@ class GitHubService
     public function forgetContributions(string $username): void
     {
         Cache::forget($this->contributionCacheKey($username));
+    }
+
+    /**
+     * Forget activity-derived data after a verified repository push.
+     */
+    public function forgetActivity(string $username): void
+    {
+        $this->forgetContributions($username);
+        Cache::forget($this->languageCacheKey($username));
+        Cache::forget("github.repos.{$username}");
     }
 
     /**
@@ -302,6 +329,74 @@ class GitHubService
     private function contributionCacheKey(string $username): string
     {
         return "github.contributions.{$username}";
+    }
+
+    private function languageCacheKey(string $username): string
+    {
+        return "github.languages.v3.{$username}";
+    }
+
+    /**
+     * @param  list<string>  $languageUrls
+     * @return array<string, int>
+     */
+    private function languageBytes(array $languageUrls): array
+    {
+        if ($languageUrls === []) {
+            return [];
+        }
+
+        $token = config('services.github.token');
+
+        try {
+            $responses = Http::pool(function (Pool $pool) use ($languageUrls, $token): array {
+                return array_map(function (string $url) use ($pool, $token) {
+                    $request = $pool
+                        ->acceptJson()
+                        ->withHeaders(['User-Agent' => config('app.name').' portfolio'])
+                        ->connectTimeout(3)
+                        ->timeout(5);
+
+                    if (is_string($token) && $token !== '') {
+                        $request = $request->withToken($token);
+                    }
+
+                    return $request->get($url);
+                }, $languageUrls);
+            }, concurrency: self::LANGUAGE_REQUEST_CONCURRENCY);
+        } catch (\Throwable $exception) {
+            Log::info('GitHub language requests errored.', ['exception' => $exception->getMessage()]);
+
+            return [];
+        }
+
+        $bytes = [];
+
+        foreach ($responses as $response) {
+            if (! $response instanceof Response || ! $response->successful()) {
+                Log::info('GitHub language request failed.', [
+                    'status' => $response instanceof Response ? $response->status() : null,
+                ]);
+
+                return [];
+            }
+
+            $languages = $response->json();
+
+            if (! is_array($languages)) {
+                return [];
+            }
+
+            foreach ($languages as $language => $count) {
+                if (! is_string($language) || ! is_numeric($count) || (int) $count <= 0) {
+                    continue;
+                }
+
+                $bytes[$language] = ($bytes[$language] ?? 0) + (int) $count;
+            }
+        }
+
+        return $bytes;
     }
 
     /**

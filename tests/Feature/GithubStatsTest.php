@@ -101,23 +101,48 @@ class GithubStatsTest extends TestCase
         Http::assertSentCount($requestsAfterFirstVisit);
     }
 
-    public function test_blade_language_uses_the_blade_red_color(): void
+    public function test_languages_are_aggregated_by_bytes_and_use_brand_colors(): void
     {
         Http::preventStrayRequests();
         Http::fake([
             'api.github.com/users/octocat/repos*' => Http::response([
-                ['language' => 'Blade'],
-                ['language' => 'PHP'],
+                [
+                    'fork' => false,
+                    'languages_url' => 'https://api.github.com/repos/octocat/portfolio/languages',
+                ],
+                [
+                    'fork' => false,
+                    'languages_url' => 'https://api.github.com/repos/octocat/api/languages',
+                ],
+                [
+                    'fork' => true,
+                    'languages_url' => 'https://api.github.com/repos/octocat/fork/languages',
+                ],
+            ]),
+            'api.github.com/repos/octocat/portfolio/languages' => Http::response([
+                'Blade' => 400,
+                'TypeScript' => 300,
+            ]),
+            'api.github.com/repos/octocat/api/languages' => Http::response([
+                'Blade' => 200,
+                'TypeScript' => 200,
+                'PHP' => 200,
+                'JavaScript' => 200,
             ]),
         ]);
 
         Cache::flush();
 
         $languages = $this->app->make(GitHubService::class)->languages('octocat');
-        $blade = collect($languages)->firstWhere('name', 'Blade');
 
-        $this->assertNotNull($blade);
-        $this->assertSame('#F7523F', $blade['color']);
+        $this->assertSame([
+            ['name' => 'Blade', 'color' => '#F7523F', 'percentage' => 40.0],
+            ['name' => 'TypeScript', 'color' => '#3178C6', 'percentage' => 33.3],
+            ['name' => 'PHP', 'color' => '#777BB4', 'percentage' => 13.3],
+            ['name' => 'JavaScript', 'color' => '#F7DF1E', 'percentage' => 13.3],
+        ], $languages);
+
+        Http::assertNotSent(fn (Request $request): bool => $request->url() === 'https://api.github.com/repos/octocat/fork/languages');
     }
 
     public function test_contributions_are_mapped_from_the_official_github_calendar(): void
@@ -216,11 +241,13 @@ class GithubStatsTest extends TestCase
         $this->assertNull($contributions);
     }
 
-    public function test_push_webhook_invalidates_the_contribution_cache(): void
+    public function test_push_webhook_invalidates_activity_caches(): void
     {
         Cache::flush();
         $this->configureGithub(webhookSecret: 'webhook-secret');
         Cache::put('github.contributions.octocat', ['total' => 10], 30);
+        Cache::put('github.languages.v3.octocat', [['name' => 'PHP']], 900);
+        Cache::put('github.repos.octocat', [['name' => 'portfolio']], 21600);
 
         $payload = $this->webhookPayload();
 
@@ -231,6 +258,8 @@ class GithubStatsTest extends TestCase
         ], $payload)->assertNoContent();
 
         $this->assertFalse(Cache::has('github.contributions.octocat'));
+        $this->assertFalse(Cache::has('github.languages.v3.octocat'));
+        $this->assertFalse(Cache::has('github.repos.octocat'));
     }
 
     public function test_webhook_rejects_an_invalid_signature_without_invalidating_the_cache(): void
@@ -238,6 +267,7 @@ class GithubStatsTest extends TestCase
         Cache::flush();
         $this->configureGithub(webhookSecret: 'webhook-secret');
         Cache::put('github.contributions.octocat', ['total' => 10], 30);
+        Cache::put('github.languages.v3.octocat', [['name' => 'PHP']], 900);
 
         $payload = $this->webhookPayload();
 
@@ -248,6 +278,7 @@ class GithubStatsTest extends TestCase
         ], $payload)->assertForbidden();
 
         $this->assertTrue(Cache::has('github.contributions.octocat'));
+        $this->assertTrue(Cache::has('github.languages.v3.octocat'));
     }
 
     public function test_non_push_webhooks_leave_the_contribution_cache_intact(): void
@@ -255,6 +286,7 @@ class GithubStatsTest extends TestCase
         Cache::flush();
         $this->configureGithub(webhookSecret: 'webhook-secret');
         Cache::put('github.contributions.octocat', ['total' => 10], 30);
+        Cache::put('github.languages.v3.octocat', [['name' => 'PHP']], 900);
 
         $payload = $this->webhookPayload();
 
@@ -265,6 +297,7 @@ class GithubStatsTest extends TestCase
         ], $payload)->assertNoContent();
 
         $this->assertTrue(Cache::has('github.contributions.octocat'));
+        $this->assertTrue(Cache::has('github.languages.v3.octocat'));
     }
 
     public function test_upstream_failures_degrade_to_an_unavailable_payload(): void

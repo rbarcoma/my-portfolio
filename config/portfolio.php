@@ -31,12 +31,6 @@ return [
     'hero' => [
         'eyebrow' => "HELLO, I'M RENANTE",
         'headline' => 'FULL-STACK DEVELOPER',
-        'rotating' => [
-            'Laravel applications',
-            'React interfaces',
-            'REST APIs',
-            'dashboards that scale',
-        ],
         'subline' => 'I design and build end-to-end web products — from relational schemas and API contracts to pixel-perfect interfaces that feel instant.',
     ],
 

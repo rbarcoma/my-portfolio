@@ -143,9 +143,17 @@ function GithubContent({ github, compact, embedded }) {
                             <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 {languages.slice(0, 5).map((language) => (
                                     <li key={language.name} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                        <span aria-hidden="true" className="size-1.5 rounded-full bg-foreground" />
-                                        {language.name}
-                                        <span className="text-subtle">{language.percentage}%</span>
+                                        <span
+                                            aria-hidden="true"
+                                            className="size-1.5 rounded-full"
+                                            style={{ backgroundColor: language.color }}
+                                        />
+                                        <span className="font-medium" style={{ color: language.color }}>
+                                            {language.name}
+                                        </span>
+                                        <span className="tabular-nums" style={{ color: language.color }}>
+                                            {language.percentage}%
+                                        </span>
                                     </li>
                                 ))}
                             </ul>

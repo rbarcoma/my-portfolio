@@ -81,7 +81,7 @@ export function SkillsGrid({ groups }) {
                                 >
                                     <TechnologyIcon
                                         skill={skill}
-                                        className="size-6 shrink-0 brightness-0"
+                                        className="size-6 shrink-0"
                                     />
                                     <span className="min-w-0 text-sm font-medium text-foreground">{skill.name}</span>
                                 </li>

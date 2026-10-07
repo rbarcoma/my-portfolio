@@ -1,15 +1,43 @@
-import { ArrowDownRight, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useIsDesktop } from '../../hooks/useMediaQuery';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useRoute } from '../../lib/route';
 import { Button } from '../ui/button';
 import { Container } from '../common/Container';
-import { Reveal, RevealGroup, RevealItem } from '../common/Reveal';
+import { Reveal } from '../common/Reveal';
+import Particles from '../reactbits/Particles';
+
+const HERO_PARTICLE_COLORS = ['#111111'];
 
 export function Hero({ hero }) {
     const route = useRoute();
+    const isDesktop = useIsDesktop();
+    const reducedMotion = useReducedMotion();
 
     return (
-        <section id="home" className="scroll-mt-24 pt-32 pb-18 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32">
-            <Container>
+        <section
+            id="home"
+            className="relative isolate overflow-hidden scroll-mt-24 pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24"
+        >
+            {isDesktop && !reducedMotion ? (
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+                    <Particles
+                        particleColors={HERO_PARTICLE_COLORS}
+                        particleCount={160}
+                        particleSpread={14}
+                        speed={0.055}
+                        particleBaseSize={90}
+                        sizeRandomness={0.55}
+                        cameraDistance={20}
+                        moveParticlesOnHover={false}
+                        alphaParticles
+                        disableRotation
+                        pixelRatio={1.5}
+                    />
+                </div>
+            ) : null}
+
+            <Container className="relative z-10">
                 <div className="grid items-end gap-12 lg:grid-cols-12 lg:gap-10">
                     <div className="lg:col-span-8">
                         <Reveal>
@@ -43,21 +71,16 @@ export function Hero({ hero }) {
                         </Reveal>
                     </div>
 
-                    <Reveal delay={0.16} className="lg:col-span-4">
-                        <aside className="rounded-card border border-hairline bg-surface p-5 sm:p-6">
-                            <div className="flex items-center justify-between gap-4 border-b border-hairline pb-4">
-                                <p className="text-sm font-medium">What I work with</p>
-                                <ArrowDownRight className="size-4 text-muted-foreground" aria-hidden="true" />
-                            </div>
-                            <RevealGroup className="mt-5 grid gap-3" stagger={0.05}>
-                                {hero.rotating?.map((item, index) => (
-                                    <RevealItem key={item} className="flex items-center gap-3">
-                                        <span className="w-5 text-xs tabular-nums text-subtle">0{index + 1}</span>
-                                        <span className="text-sm text-muted-foreground">{item}</span>
-                                    </RevealItem>
-                                ))}
-                            </RevealGroup>
-                        </aside>
+                    <Reveal delay={0.16} className="hidden self-stretch lg:col-span-4 lg:flex lg:items-end lg:justify-end">
+                        <figure className="flex h-[31rem] w-full max-w-[22rem] items-end justify-center">
+                            <img
+                                src="/images/hero-character-transparent.png"
+                                alt="Pixel-art portrait of Renante Barcoma"
+                                width={821}
+                                height={1915}
+                                className="h-[30rem] w-auto max-w-none object-contain [image-rendering:pixelated]"
+                            />
+                        </figure>
                     </Reveal>
                 </div>
             </Container>

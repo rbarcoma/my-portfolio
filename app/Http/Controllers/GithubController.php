@@ -30,7 +30,7 @@ class GithubController extends Controller
             $username = (string) config('portfolio.github_username');
 
             if ($username !== '') {
-                $github->forgetContributions($username);
+                $github->forgetActivity($username);
             }
         }
 
