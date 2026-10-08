@@ -47,6 +47,7 @@ export function ContactForm() {
                     <Input
                         id="name"
                         name="name"
+                        placeholder="e.g John Doe"
                         value={data.name}
                         onChange={(event) => setData('name', event.target.value)}
                         autoComplete="name"
@@ -64,6 +65,7 @@ export function ContactForm() {
                         id="email"
                         name="email"
                         type="email"
+                        placeholder="e.g johndoe@gmail.com"
                         value={data.email}
                         onChange={(event) => setData('email', event.target.value)}
                         autoComplete="email"
@@ -81,6 +83,7 @@ export function ContactForm() {
                 <Input
                     id="subject"
                     name="subject"
+                    placeholder="e.g Portfolio website project"
                     value={data.subject}
                     onChange={(event) => setData('subject', event.target.value)}
                     className="mt-2"
@@ -95,6 +98,7 @@ export function ContactForm() {
                 <Textarea
                     id="message"
                     name="message"
+                    placeholder="e.g Hi Renante, I'd like to discuss..."
                     value={data.message}
                     onChange={(event) => setData('message', event.target.value)}
                     required
