@@ -21,7 +21,7 @@ function bar() {
             'width:100%',
             'transform:scaleX(0)',
             'transform-origin:left',
-            'background:#111111',
+            'background:var(--color-accent)',
             'z-index:60',
             'pointer-events:none',
             'transition:transform 200ms cubic-bezier(0.16,1,0.3,1), opacity 250ms ease',

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../js/**/*.{js,jsx}';
@@ -42,6 +44,25 @@
 @layer base {
     :root {
         color-scheme: light;
+    }
+
+    :root.dark {
+        color-scheme: dark;
+        --color-base: #121212;
+        --color-surface: #18181b;
+        --color-surface-2: #222225;
+        --color-elevated: #2c2c30;
+        --color-accent: #f4f4f5;
+        --color-accent-soft: #2c2c30;
+        --color-accent-dim: #d4d4d8;
+        --color-secondary: #a1a1aa;
+        --color-foreground: #f4f4f5;
+        --color-muted-foreground: #b4b4bd;
+        --color-subtle: #a1a1aa;
+        --color-hairline: rgb(255 255 255 / 0.12);
+        --color-hairline-strong: rgb(255 255 255 / 0.22);
+        --color-overlay: rgb(255 255 255 / 0.045);
+        --color-grid-line: rgb(255 255 255 / 0.045);
     }
 
     html {

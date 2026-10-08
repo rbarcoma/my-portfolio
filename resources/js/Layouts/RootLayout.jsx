@@ -12,10 +12,10 @@ export function RootLayout({ children }) {
 
     return (
         <TooltipProvider>
-            <div className="relative flex min-h-dvh flex-col bg-white text-zinc-950">
+            <div className="relative flex min-h-dvh flex-col bg-surface text-foreground">
                 <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-zinc-950 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-2 focus:outline-offset-2 focus:outline-zinc-950"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-foreground focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-base focus:outline-2 focus:outline-offset-2 focus:outline-foreground"
                 >
                     Skip to content
                 </a>

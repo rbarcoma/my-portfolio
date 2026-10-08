@@ -69,7 +69,7 @@ export function Marquee({ items = [] }) {
                     hoverSpeed={50}
                     scaleOnHover
                     fadeOut
-                    fadeOutColor="#ffffff"
+                    fadeOutColor="var(--color-surface)"
                     ariaLabel="Technologies I work with"
                 />
             </Container>

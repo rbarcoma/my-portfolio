@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { useRoute } from '../../lib/route';
 import { cn } from '../../lib/utils';
 import { CvButton } from '../common/CvButton';
+import { ThemeToggle } from '../common/ThemeToggle';
 
 const LINKS = [
     { id: 'home', label: 'Home' },
@@ -82,12 +83,12 @@ export function Navbar() {
 
     return (
         <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-            <header className="fixed inset-x-0 top-0 z-40 border-b border-zinc-200/80 bg-white/85 backdrop-blur-md">
+            <header className="fixed inset-x-0 top-0 z-40 border-b border-hairline bg-surface/85 backdrop-blur-md">
                 <nav aria-label="Primary" className="container-page flex h-16 items-center gap-6">
                     <a
                         href={sectionHref('home')}
                         aria-label="Renante Barcoma home"
-                        className="font-display text-base font-bold tracking-tight text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
+                        className="font-display text-base font-bold tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
                     >
                         RB
                     </a>
@@ -103,15 +104,15 @@ export function Navbar() {
                                             href={sectionHref(link.id)}
                                             aria-current={current ? 'location' : undefined}
                                             className={cn(
-                                                'relative block px-2.5 py-2 text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950',
-                                                current ? 'font-medium text-zinc-950' : 'text-zinc-500 hover:text-zinc-950',
+                                                'relative block px-2.5 py-2 text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-foreground',
+                                                current ? 'font-medium text-foreground' : 'text-subtle hover:text-foreground',
                                             )}
                                         >
                                             {link.label}
                                             {current && (
                                                 <span
                                                     aria-hidden="true"
-                                                    className="absolute right-2.5 bottom-0 left-2.5 border-b border-zinc-950"
+                                                    className="absolute right-2.5 bottom-0 left-2.5 border-b border-foreground"
                                                 />
                                             )}
                                         </a>
@@ -125,15 +126,17 @@ export function Navbar() {
                                 cv={props.cv}
                                 size="sm"
                                 label="Download CV"
-                                className="bg-zinc-950 text-white shadow-none hover:bg-zinc-800 hover:shadow-none"
+                                className="shadow-none hover:shadow-none"
                             />
                         </div>
+
+                        <ThemeToggle />
 
                         <DialogPrimitive.Trigger asChild>
                             <button
                                 type="button"
                                 aria-label="Open menu"
-                                className="inline-flex size-9 items-center justify-center rounded-md border border-zinc-300 text-zinc-700 transition-colors duration-200 hover:border-zinc-950 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950 lg:hidden"
+                                className="inline-flex size-9 items-center justify-center rounded-md border border-hairline-strong text-muted-foreground transition-colors duration-200 hover:border-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-foreground lg:hidden"
                             >
                                 <Menu className="size-4" aria-hidden="true" />
                             </button>
@@ -143,34 +146,34 @@ export function Navbar() {
             </header>
 
             <DialogPrimitive.Portal>
-                <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-zinc-950/10 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
-                <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-zinc-200 bg-white p-6 shadow-xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right sm:p-8">
-                    <DialogPrimitive.Title className="font-display text-lg font-semibold text-zinc-950">
+                <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+                <DialogPrimitive.Content className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-hairline bg-surface p-6 shadow-xl data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right sm:p-8">
+                    <DialogPrimitive.Title className="font-display text-lg font-semibold text-foreground">
                         Navigation
                     </DialogPrimitive.Title>
                     <DialogPrimitive.Description className="sr-only">
                         Choose a section of the site or download the CV.
                     </DialogPrimitive.Description>
                     <DialogPrimitive.Close
-                        className="absolute top-5 right-5 inline-flex size-9 items-center justify-center rounded-md text-zinc-500 transition-colors duration-200 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-zinc-950"
+                        className="absolute top-5 right-5 inline-flex size-9 items-center justify-center rounded-md text-subtle transition-colors duration-200 hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-foreground"
                         aria-label="Close menu"
                     >
                         <X className="size-4" aria-hidden="true" />
                     </DialogPrimitive.Close>
 
-                    <ul className="mt-12 flex flex-col border-t border-zinc-200">
+                    <ul className="mt-12 flex flex-col border-t border-hairline">
                         {LINKS.map((link) => {
                             const current = pathname === '/' && activeSection === link.id;
 
                             return (
-                                <li key={link.id} className="border-b border-zinc-200">
+                                <li key={link.id} className="border-b border-hairline">
                                     <DialogPrimitive.Close asChild>
                                         <a
                                             href={sectionHref(link.id)}
                                             aria-current={current ? 'location' : undefined}
                                             className={cn(
-                                                'block py-4 font-display text-xl tracking-tight transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950',
-                                                current ? 'font-semibold text-zinc-950' : 'text-zinc-600 hover:text-zinc-950',
+                                                'block py-4 font-display text-xl tracking-tight transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
+                                                current ? 'font-semibold text-foreground' : 'text-muted-foreground hover:text-foreground',
                                             )}
                                         >
                                             {link.label}
@@ -181,12 +184,12 @@ export function Navbar() {
                         })}
                     </ul>
 
-                    <div className="mt-auto border-t border-zinc-200 pt-6">
+                    <div className="mt-auto border-t border-hairline pt-6">
                         <CvButton
                             cv={props.cv}
                             size="md"
                             label="Download CV"
-                            className="w-full justify-center bg-zinc-950 text-white shadow-none hover:bg-zinc-800 hover:shadow-none"
+                            className="w-full justify-center shadow-none hover:shadow-none"
                         />
                     </div>
                 </DialogPrimitive.Content>

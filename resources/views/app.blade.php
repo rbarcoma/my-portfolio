@@ -10,6 +10,22 @@
         <meta name="author" content="{{ config('portfolio.name') }}" />
         <meta name="theme-color" content="#FAFAF8" />
 
+        <script>
+            (() => {
+                let theme;
+
+                try {
+                    theme = localStorage.getItem('portfolio-theme');
+                } catch {
+                    // Fall back to the system preference when storage is unavailable.
+                }
+
+                const isDark = theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.classList.toggle('dark', isDark);
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#121212' : '#FAFAF8');
+            })();
+        </script>
+
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
         @viteReactRefresh
