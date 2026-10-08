@@ -12,6 +12,7 @@ import { GithubPanel } from '../Components/sections/GitHubPanel';
 import { SkillsGrid } from '../Components/sections/SkillsGrid';
 import { Timeline } from '../Components/sections/Timeline';
 import { ContactForm } from '../Components/sections/ContactForm';
+import TextLoop from '../Components/reactbits/TextLoop';
 import { useGithubStats } from '../hooks/useGithubStats';
 import { useRoute } from '../lib/route';
 
@@ -55,6 +56,28 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
             )}
 
             <Timeline items={timeline} id="experience" />
+
+            <div aria-hidden="true" className="relative isolate overflow-hidden border-y border-hairline bg-surface">
+                <TextLoop
+                    text="LinkedIn ✦ Email ✦ Github"
+                    shape="wave"
+                    speed={110}
+                    direction="forward"
+                    separator="✦"
+                    curviness={12}
+                    fontSize={26}
+                    fontWeight={800}
+                    letterSpacing={6}
+                    uppercase
+                    color="#ffffff"
+                    ribbon
+                    ribbonColor="#000000"
+                    ribbonWidth={80}
+                    pauseOnHover={false}
+                    className="pointer-events-none relative left-1/2 -translate-x-1/2"
+                    style={{ width: 'max(100vw, 42rem)' }}
+                />
+            </div>
 
             <section id="contact" className="scroll-mt-24 section-pad">
                 <Container>
