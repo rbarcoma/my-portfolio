@@ -57,7 +57,7 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
 
             <Timeline items={timeline} id="experience" />
 
-            <div aria-hidden="true" className="relative isolate overflow-hidden border-y border-hairline bg-surface">
+            <div aria-hidden="true" className="relative mx-auto isolate h-[8rem] overflow-hidden">
                 <TextLoop
                     text="LinkedIn ✦ Email ✦ Github"
                     shape="wave"
@@ -65,16 +65,16 @@ export default function Home({ hero, stats, about, groups, projects, timeline, c
                     direction="forward"
                     separator="✦"
                     curviness={12}
-                    fontSize={26}
+                    fontSize={15}
                     fontWeight={800}
-                    letterSpacing={6}
+                    letterSpacing={7}
                     uppercase
                     color="#ffffff"
                     ribbon
                     ribbonColor="#000000"
-                    ribbonWidth={80}
+                    ribbonWidth={45}
                     pauseOnHover={false}
-                    className="pointer-events-none relative left-1/2 -translate-x-1/2"
+                    className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                     style={{ width: 'max(100vw, 42rem)' }}
                 />
             </div>
