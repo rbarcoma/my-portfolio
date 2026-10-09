@@ -60,7 +60,7 @@ return [
             'My day-to-day is Laravel and React: migrations and models on one side, components and interactions on the other. I care about the boring parts too — validation, accessibility, error states, and the code someone else will read in six months.',
             'Outside of coursework I take on freelance builds, sharpen my data/AI work with forecasting projects, and write about what I learn so the next person saves an afternoon.',
         ],
-        'photo' => '/images/portrait.svg',
+        'photo' => '/images/ren2.jpeg',
         'quick_facts' => [
             ['label' => 'Name', 'value' => 'Renante Barcoma'],
             ['label' => 'Role', 'value' => 'Full-Stack Developer'],
@@ -148,7 +148,7 @@ return [
             'period' => '2023 — 2027',
             'title' => 'BS Information Technology',
             'org' => 'Our Lady of Fatima University',
-            'location' => 'Valenzuela, Philippines',
+            'location' => 'Quezon City, Philippines',
             'description' => 'Undergraduate program covering systems analysis, database design, web systems, data structures, and software engineering. Currently building capstone-grade full-stack projects on Laravel and React.',
             'points' => [
                 'Coursework: Web Systems, Database Systems, Systems Analysis & Design, Data Structures',
