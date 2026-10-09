@@ -25,5 +25,5 @@ Route::get('/github/stats', [GithubController::class, 'stats'])
     ->middleware('throttle:60,1')
     ->name('github.stats');
 Route::post('/github/webhook', [GithubController::class, 'webhook'])
-    ->middleware('throttle:120,1')
+    ->middleware('throttle:10,1')
     ->name('github.webhook');
