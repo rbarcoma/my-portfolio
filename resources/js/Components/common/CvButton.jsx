@@ -3,8 +3,7 @@ import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 
 /**
- * CV download CTA. Download attribute keeps the browser on the page;
- * the route streams the PDF from public/ when it exists.
+ * CV download CTA. Download the public PDF directly without an application request.
  */
 export function CvButton({ cv, className, size = 'md', label }) {
     if (!cv?.path) {
@@ -13,7 +12,7 @@ export function CvButton({ cv, className, size = 'md', label }) {
 
     return (
         <Button asChild size={size} className={className}>
-            <a href="/cv" download={cv.filename}>
+            <a href={cv.path} download={cv.filename}>
                 <ArrowDownToLine aria-hidden="true" />
                 <span>{label ?? cv.label ?? 'Download CV'}</span>
             </a>
